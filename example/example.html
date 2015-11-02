@@ -1,0 +1,66 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.6/rx.lite.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.4/vue.js"></script>
+<script src="../vue-rx.js"></script>
+
+<p>Type to serach Wikipedia</p>
+<input>
+
+<div id="el">
+  <div v-if="results">
+    <h1>{{ results.term }}</h1>
+    <ul v-if="results.matches.length">
+      <li v-for="match in results.matches">
+        <a :href="match.url">{{ match.title }}</a>
+        <p>{{ match.description }}</p>
+      </li>
+    </ul>
+    <p v-else>
+      No mathces found.
+    </p>
+  </div>
+</div>
+
+<script>
+// this is the example in RxJS's readme.
+var dataSource = Rx.Observable
+  .fromEvent(document.querySelector('input'), 'keyup')
+  .pluck('target', 'value')
+  .filter(function (text) {
+    return text.length > 2
+  })
+  .debounce(500)
+  .distinctUntilChanged()
+  .flatMapLatest(function (term) {
+    return $.ajax({
+      url: 'http://en.wikipedia.org/w/api.php',
+      dataType: 'jsonp',
+      data: {
+        action: 'opensearch',
+        format: 'json',
+        search: term
+      }
+    }).promise()
+  })
+  // format the final data a little bit
+  .map(function (res) {
+    return {
+      term: res[0],
+      matches: res[1].map(function (title, i) {
+        return {
+          title: title,
+          description: res[2][i],
+          url: res[3][i]
+        }
+      })
+    }
+  })
+
+// simply bind to the observable.
+var vm = new Vue({
+  el: '#el',
+  data: {
+    results: dataSource
+  }
+})
+</script>

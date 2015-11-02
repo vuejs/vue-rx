@@ -1,0 +1,22 @@
+{
+  "name": "vue-rx",
+  "version": "1.0.0",
+  "description": "RxJS bindings for Vue",
+  "main": "vue-rx.js",
+  "files": ["vue-rx.js"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vuejs/vue-rx.git"
+  },
+  "keywords": [
+    "vue",
+    "rx",
+    "rxjs"
+  ],
+  "author": "Evan You",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vuejs/vue-rx/issues"
+  },
+  "homepage": "https://github.com/vuejs/vue-rx#readme"
+}
