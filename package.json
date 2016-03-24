@@ -1,9 +1,11 @@
 {
   "name": "vue-rx",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "RxJS bindings for Vue",
   "main": "vue-rx.js",
-  "files": ["vue-rx.js"],
+  "files": [
+    "vue-rx.js"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vuejs/vue-rx.git"
