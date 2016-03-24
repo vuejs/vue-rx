@@ -32,7 +32,7 @@
                 raw[key] = null
                 ;(self._rxHandles || (self._rxHandles = []))
                   .push(val.subscribe(function (value) {
-                    self[key] = value
+                    self[key] = raw[key] = value
                   }))
               }
             })
