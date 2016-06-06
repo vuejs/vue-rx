@@ -26,3 +26,7 @@ new Vue({
 With global scripts: just make sure to include `vue-rx.js` after Vue.js and RxJS. It will be installed automatically.
 
 See `/example` for a simple example.
+
+### License
+
+[MIT](http://opensource.org/licenses/MIT)
