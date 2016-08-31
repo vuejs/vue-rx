@@ -2,19 +2,9 @@
 
   var installed = false
 
-  function VueRx (Vue, Rx) {
+  function VueRx (Vue) {
     if (installed) {
       return
-    }
-
-    if (!Rx) {
-      if (typeof window !== 'undefined' && window.Rx) {
-        Rx = window.Rx
-      } else {
-        throw new Error(
-          'Make sure to pass in Rx if it is not available globally: Vue.use(VueRx, Rx)'
-        )
-      }
     }
 
     installed = true
@@ -28,7 +18,7 @@
             var raw = dataFn()
             Object.keys(raw).forEach(function (key) {
               var val = raw[key]
-              if (val instanceof Rx.Observable) {
+              if (val.subscribe instanceof Function) {
                 raw[key] = null
                 ;(self._rxHandles || (self._rxHandles = []))
                   .push(val.subscribe(function (value) {
