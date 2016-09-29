@@ -21,7 +21,7 @@
           var raw = dataFn()
           Object.keys(raw).forEach(function (key) {
             var val = raw[key]
-            if (val.subscribe instanceof Function) {
+            if (val && val.subscribe instanceof Function) {
               raw[key] = null
               ;(self._rxHandles || (self._rxHandles = []))
                 .push(val.subscribe(function (value) {
