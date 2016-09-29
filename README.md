@@ -1,6 +1,6 @@
 # vue-rx
 
-Simple [RxJS](https://github.com/Reactive-Extensions/RxJS) binding for Vue.js (1.0.0+).
+Simple [RxJS](https://github.com/Reactive-Extensions/RxJS) binding for Vue.js.
 
 ### Usage
 
