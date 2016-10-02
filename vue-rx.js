@@ -7,7 +7,11 @@
       beforeDestroy: function () {
         if (this._rxHandles) {
           this._rxHandles.forEach(function (handle) {
-            handle.dispose()
+            if (handle.dispose) {
+              handle.dispose()
+            } else if (handle.unsubscribe) {
+              handle.unsubscribe()
+            }
           })
         }
       }
