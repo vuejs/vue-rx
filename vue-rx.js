@@ -1,5 +1,11 @@
 (function () {
-  function VueRx (Vue,Rx) {
+  function VueRx (Vue, Rx) {
+    if (!Rx) {
+      throw new Error(
+        'vue-rx requires passing the Rx object to Vue.use() as the 2nd argument.'
+      )
+    }
+
     var VueVersion = Number(Vue.version && Vue.version.split('.')[0])
     var initHook = VueVersion && VueVersion > 1 ? 'beforeCreate' : 'init'
 
@@ -40,42 +46,40 @@
 
     Vue.mixin(mixin)
 
-
-    Vue.prototype.$watchAsObservable = function (expOrFn,options) {
-      var self = this;
+    Vue.prototype.$watchAsObservable = function (expOrFn, options) {
+      var self = this
 
       var obs$ = Rx.Observable.create(function (observer) {
         // Create function to handle old and new Value
         function listener (newValue, oldValue) {
-          observer.next({ oldValue: oldValue, newValue: newValue });
+          observer.next({ oldValue: oldValue, newValue: newValue })
         }
 
         // Returns function which disconnects the $watch expression
-        var disposable;
-        if(Rx.Subscription){//Rx5
-          disposable = new Rx.Subscription(self.$watch(expOrFn,listener,options));
-        }else{//Rx4
-          disposable = Rx.Disposable.create(self.$watch(expOrFn,listener,options));
+        var disposable
+        if (Rx.Subscription) { // Rx5
+          disposable = new Rx.Subscription(self.$watch(expOrFn, listener, options))
+        } else { // Rx4
+          disposable = Rx.Disposable.create(self.$watch(expOrFn, listener, options))
         }
 
-        return disposable;
-      }).publish().refCount();
+        return disposable
+      }).publish().refCount()
 
-      (self._rxHandles || (self._rxHandles = [])).push(obs$);
+      ;(self._rxHandles || (self._rxHandles = [])).push(obs$)
 
-      return obs$;
+      return obs$
     }
-
   }
 
   // auto install
-  if (typeof Vue !== 'undefined') {
-    Vue.use(VueRx,Rx)
+  if (typeof Vue !== 'undefined' && typeof Rx !== 'undefined') {
+    Vue.use(VueRx, Rx)
   }
 
-  if(typeof exports === 'object' && typeof module === 'object') {
+  if (typeof exports === 'object' && typeof module === 'object') {
     module.exports = VueRx
-  } else if(typeof define === 'function' && define.amd) {
+  } else if (typeof define === 'function' && define.amd) {
     define(function () { return VueRx })
   } else if (typeof window !== 'undefined') {
     window.VueRx = VueRx
