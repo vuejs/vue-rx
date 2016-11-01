@@ -1,5 +1,5 @@
 (function () {
-  function VueRx (Vue) {
+  function VueRx (Vue,Rx) {
     var VueVersion = Number(Vue.version && Vue.version.split('.')[0])
     var initHook = VueVersion && VueVersion > 1 ? 'beforeCreate' : 'init'
 
@@ -39,11 +39,33 @@
     }
 
     Vue.mixin(mixin)
+
+
+    Vue.prototype.$watchAsObservable = function (expOrFn,options) {
+      var self = this;
+
+      var obs$ = Rx.Observable.create(function (observer) {
+        // Create function to handle old and new Value
+        function listener (newValue, oldValue) {
+          observer.next({ oldValue: oldValue, newValue: newValue });
+        }
+
+        // Returns function which disconnects the $watch expression
+        var disposable = new Rx.Subscription(self.$watch(expOrFn,listener,options));
+
+        return disposable;
+      }).publish().refCount();
+
+      (self._rxHandles || (self._rxHandles = [])).push(obs$);
+
+      return obs$;
+    }
+
   }
 
   // auto install
   if (typeof Vue !== 'undefined') {
-    Vue.use(VueRx)
+    Vue.use(VueRx,Rx)
   }
 
   if(typeof exports === 'object' && typeof module === 'object') {
