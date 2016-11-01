@@ -1,5 +1,5 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.6/rx.lite.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/5.0.0-rc.1/Rx.min.js"></script>
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
 <script src="../vue-rx.js"></script>
 
@@ -29,10 +29,10 @@ var dataSource = Rx.Observable
   .filter(function (text) {
     return text.length > 2
   })
-  .debounce(500)
+  .debounceTime(500)
   .distinctUntilChanged()
-  .flatMapLatest(function (term) {
-    return $.ajax({
+  .switchMap(function (term) {
+    return Rx.Observable.fromPromise($.ajax({
       url: 'http://en.wikipedia.org/w/api.php',
       dataType: 'jsonp',
       data: {
@@ -40,7 +40,7 @@ var dataSource = Rx.Observable
         format: 'json',
         search: term
       }
-    }).promise()
+    }).promise())
   })
   // format the final data a little bit
   .map(function (res) {
@@ -60,7 +60,22 @@ var dataSource = Rx.Observable
 var vm = new Vue({
   el: '#el',
   data: {
+    a:5,
     results: dataSource
   }
-})
+});
+
+
+setTimeout(function () {
+  vm.a = 17;
+},5000)
+
+  vm.$watchAsObservable('a')
+          .subscribe(function (val) {
+            console.log('stream value',val);
+          },function (err) {
+            console.error(err)
+          },function () {
+            console.log('complete');
+          })
 </script>
