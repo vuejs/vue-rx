@@ -51,7 +51,12 @@
         }
 
         // Returns function which disconnects the $watch expression
-        var disposable = new Rx.Subscription(self.$watch(expOrFn,listener,options));
+        var disposable;
+        if(Rx.Subscription){//Rx5
+          disposable = new Rx.Subscription(self.$watch(expOrFn,listener,options));
+        }else{//Rx4
+          disposable = Rx.Disposable.create(self.$watch(expOrFn,listener,options));
+        }
 
         return disposable;
       }).publish().refCount();
