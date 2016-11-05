@@ -60,22 +60,23 @@ var dataSource = Rx.Observable
 var vm = new Vue({
   el: '#el',
   data: {
-    a:5,
+    a: 5
+  },
+  subscriptions: {
     results: dataSource
   }
-});
-
+})
 
 setTimeout(function () {
-  vm.a = 17;
-},5000)
+  vm.a = 17
+}, 5000)
 
-  vm.$watchAsObservable('a')
-          .subscribe(function (val) {
-            console.log('stream value',val);
-          },function (err) {
-            console.error(err)
-          },function () {
-            console.log('complete');
-          })
+vm.$watchAsObservable('a')
+  .subscribe(function (val) {
+    console.log('stream value',val)
+  },function (err) {
+    console.error(err)
+  },function () {
+    console.log('complete')
+  })
 </script>

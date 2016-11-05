@@ -1,15 +1,36 @@
 (function () {
   function VueRx (Vue, Rx) {
-    if (!Rx) {
-      throw new Error(
-        'vue-rx requires passing the Rx object to Vue.use() as the 2nd argument.'
-      )
+    var warn = Vue.util.warn || function () {}
+
+    function defineReactive (vm, key, val) {
+      if (key in vm) {
+        vm[key] = val
+      } else {
+        Vue.util.defineReactive(vm, key, val)
+      }
     }
 
-    var VueVersion = Number(Vue.version && Vue.version.split('.')[0])
-    var initHook = VueVersion && VueVersion > 1 ? 'beforeCreate' : 'init'
-
-    var mixin = {
+    Vue.mixin({
+      created () {
+        var vm = this
+        var obs = vm.$options.subscriptions
+        if (typeof obs === 'function') {
+          obs = obs.call(vm)
+        }
+        if (!obs) return
+        vm._rxHandles = []
+        Object.keys(obs).forEach(function (key) {
+          defineReactive(vm, key, undefined)
+          var ob = obs[key]
+          if (!ob || typeof ob.subscribe !== 'function') {
+            warn('Invalid Observable found in rx option with key "' + key + '".', vm)
+            return
+          }
+          vm._rxHandles.push(obs[key].subscribe(function (value) {
+            vm[key] = value
+          }))
+        })
+      },
       beforeDestroy: function () {
         if (this._rxHandles) {
           this._rxHandles.forEach(function (handle) {
@@ -21,32 +42,18 @@
           })
         }
       }
-    }
-
-    mixin[initHook] = function init () {
-      var self = this
-      var dataFn = this.$options.data
-      if (dataFn) {
-        this.$options.data = function () {
-          var raw = dataFn()
-          Object.keys(raw).forEach(function (key) {
-            var val = raw[key]
-            if (val && val.subscribe instanceof Function) {
-              raw[key] = null
-              ;(self._rxHandles || (self._rxHandles = []))
-                .push(val.subscribe(function (value) {
-                  self[key] = raw[key] = value
-                }))
-            }
-          })
-          return raw
-        }
-      }
-    }
-
-    Vue.mixin(mixin)
+    })
 
     Vue.prototype.$watchAsObservable = function (expOrFn, options) {
+      if (!Rx) {
+        warn(
+          '$watchAsObservable requires passing the Rx to Vue.use() as the ' +
+          'second argument.',
+          this
+        )
+        return
+      }
+
       var self = this
 
       var obs$ = Rx.Observable.create(function (observer) {
