@@ -22,23 +22,19 @@
       }
     }
 
-    function init () {
-      var vm = this
-      var dataFn = vm.$options.data
-      var obs = vm.$options.subscriptions
-      if (!obs) return
-
-      // inject initialization into the data fn so that it is called
-      // AFTER props and BEFORE watchers/computed are set up
-      vm.$options.data = function () {
+    Vue.mixin({
+      created: function init () {
+        var vm = this
+        var obs = vm.$options.subscriptions
         if (typeof obs === 'function') {
           obs = obs.call(vm)
         }
         if (!obs) return
+        vm.$subscriptions = {}
         vm._obSubscriptions = []
         Object.keys(obs).forEach(function (key) {
           defineReactive(vm, key, undefined)
-          var ob = obs[key]
+          var ob = vm.$subscriptions[key] = obs[key]
           if (!ob || typeof ob.subscribe !== 'function') {
             warn(
               'Invalid Observable found in subscriptions option with key "' + key + '".',
@@ -50,13 +46,7 @@
             vm[key] = value
           }))
         })
-        return dataFn ? dataFn() : {}
-      }
-    }
-
-    Vue.mixin({
-      init: init, // 1.x
-      beforeCreate: init, // 2.0,
+      },
       beforeDestroy: function () {
         if (this._obSubscriptions) {
           this._obSubscriptions.forEach(function (handle) {
