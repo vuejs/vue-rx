@@ -23,7 +23,7 @@
           obs = obs.call(vm)
         }
         if (!obs) return
-        vm._rxHandles = []
+        vm._obSubscriptions = []
         Object.keys(obs).forEach(function (key) {
           defineReactive(vm, key, undefined)
           var ob = obs[key]
@@ -34,7 +34,7 @@
             )
             return
           }
-          vm._rxHandles.push(obs[key].subscribe(function (value) {
+          vm._obSubscriptions.push(obs[key].subscribe(function (value) {
             vm[key] = value
           }))
         })
@@ -44,10 +44,10 @@
 
     Vue.mixin({
       init: init, // 1.x
-      beforeCreate: init, // 2.0
+      beforeCreate: init, // 2.0,
       beforeDestroy: function () {
-        if (this._rxHandles) {
-          this._rxHandles.forEach(function (handle) {
+        if (this._obSubscriptions) {
+          this._obSubscriptions.forEach(function (handle) {
             if (handle.dispose) {
               handle.dispose()
             } else if (handle.unsubscribe) {
@@ -61,34 +61,48 @@
     Vue.prototype.$watchAsObservable = function (expOrFn, options) {
       if (!Rx) {
         warn(
-          '$watchAsObservable requires passing the Rx to Vue.use() as the ' +
-          'second argument.',
+          '$watchAsObservable requires Rx to be present globally or ' +
+          'be passed to Vue.use() as the second argument.',
           this
         )
         return
       }
 
-      var self = this
-
+      var vm = this
       var obs$ = Rx.Observable.create(function (observer) {
         // Create function to handle old and new Value
         function listener (newValue, oldValue) {
           observer.next({ oldValue: oldValue, newValue: newValue })
         }
 
+        var _unwatch
+        function watch () {
+          _unwatch = vm.$watch(expOrFn, listener, options)
+        }
+        function unwatch () {
+          _unwatch && _unwatch()
+        }
+
+        // if $watchAsObservable is called inside the subscriptions function,
+        // because data hasn't been observed yet, the watcher will not work.
+        // in that case, wait until created hook to watch.
+        if (vm._data) {
+          watch()
+        } else {
+          vm.$once('hook:created', watch)
+        }
+
         // Returns function which disconnects the $watch expression
         var disposable
         if (Rx.Subscription) { // Rx5
-          disposable = new Rx.Subscription(self.$watch(expOrFn, listener, options))
+          disposable = new Rx.Subscription(unwatch)
         } else { // Rx4
-          disposable = Rx.Disposable.create(self.$watch(expOrFn, listener, options))
+          disposable = Rx.Disposable.create(unwatch)
         }
-
         return disposable
       }).publish().refCount()
 
-      ;(self._rxHandles || (self._rxHandles = [])).push(obs$)
-
+      ;(vm._obSubscriptions || (vm._obSubscriptions = [])).push(obs$)
       return obs$
     }
   }

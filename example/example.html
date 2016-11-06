@@ -4,9 +4,9 @@
 <script src="../vue-rx.js"></script>
 
 <p>Type to search Wikipedia</p>
-<input>
 
 <div id="el">
+  <input v-model="search"> {{ search }}
   <div v-if="results">
     <h1>{{ results.term }}</h1>
     <ul v-if="results.matches.length">
@@ -22,61 +22,44 @@
 </div>
 
 <script>
-// this is the example in RxJS's readme.
-var dataSource = Rx.Observable
-  .fromEvent(document.querySelector('input'), 'keyup')
-  .pluck('target', 'value')
-  .filter(function (text) {
-    return text.length > 2
-  })
-  .debounceTime(500)
-  .distinctUntilChanged()
-  .switchMap(function (term) {
-    return Rx.Observable.fromPromise($.ajax({
-      url: 'http://en.wikipedia.org/w/api.php',
-      dataType: 'jsonp',
-      data: {
-        action: 'opensearch',
-        format: 'json',
-        search: term
-      }
-    }).promise())
-  })
-  // format the final data a little bit
-  .map(function (res) {
-    return {
-      term: res[0],
-      matches: res[1].map(function (title, i) {
-        return {
-          title: title,
-          description: res[2][i],
-          url: res[3][i]
-        }
-      })
+function fetchTerm (term) {
+  return Rx.Observable.fromPromise($.ajax({
+    url: 'http://en.wikipedia.org/w/api.php',
+    dataType: 'jsonp',
+    data: {
+      action: 'opensearch',
+      format: 'json',
+      search: term
     }
-  })
+  }).promise())
+}
 
-// simply bind to the observable.
+function formatResult (res) {
+  return {
+    term: res[0],
+    matches: res[1].map((title, i) => ({
+      title: title,
+      description: res[2][i],
+      url: res[3][i]
+    }))
+  }
+}
+
 var vm = new Vue({
   el: '#el',
   data: {
-    a: 5
+    search: ''
   },
-  subscriptions: {
-    results: dataSource
+  subscriptions () {
+    return {
+      // this is the example in RxJS's readme.
+      results: this.$watchAsObservable('search')
+        .pluck('newValue')
+        .filter(text => text.length > 2)
+        .debounceTime(500)
+        .distinctUntilChanged()
+        .switchMap(fetchTerm)
+        .map(formatResult)
+    }
   }
-})
-
-setTimeout(function () {
-  vm.a = 17
-}, 5000)
-
-vm.$watchAsObservable('a')
-  .subscribe(function (val) {
-    console.log('stream value',val)
-  },function (err) {
-    console.error(err)
-  },function () {
-    console.log('complete')
-  })
-</script>
+})</script>

@@ -1,37 +1,31 @@
 # vue-rx
 
-Simple [RxJS](https://github.com/Reactive-Extensions/RxJS) binding for Vue.js.
+Simple [RxJS](https://github.com/Reactive-Extensions/RxJS) binding for Vue.js. It also supports subscriptions for generic observables that implement the `.subscribe` and `.unsubscribe` (or `.dispise`) interface. For example, you can use it to subscribe to `most.js` or Falcor streams, but some features require RxJS to work.
 
 ### Installation
 
-- With global scripts: just make sure to include `vue-rx.js` after Vue.js and RxJS. It will be installed automatically.
+#### NPM + ES2015
 
-- With NPM:
-
-  ``` js
-  var Vue = require('vue')
-  var Rx = require('rx')
-  var VueRx = require('vue-rx')
-
-  // tada!
-  Vue.use(VueRx, Rx)
-
-  // The second argument is optional if you are not using RxJS but other generic observable implementations:
-  Vue.use(VueRx)
-  ```
-
-### Usage
-
-With NPM:
+``` bash
+npm install vue vue-rx rxjs --save
+```
 
 ``` js
-var Vue = require('vue')
-var Rx = require('rx')
-var VueRx = require('vue-rx')
+import Vue from 'vue'
+import Rxfrom 'rxjs/Rx'
+import VueRx from 'vue-rx'
 
 // tada!
 Vue.use(VueRx, Rx)
+```
 
+#### Global Script
+
+Just make sure to include `vue-rx.js` after Vue.js and RxJS. It will be installed automatically.
+
+### Usage
+
+``` js
 // provide Rx observables with the `subscriptions` option
 new Vue({
   el: '#app',
@@ -58,13 +52,9 @@ Vue.component('foo', {
 })
 ```
 
-### Using with Alternative Observable Implementations
+#### `$watchAsObservable`
 
-You can use this plugin with other observable implementations, as long as it implements the `.subscribe` and `.dispose / .unsubscribe` interface. For example, you can use it with `most.js` or Falcor streams.
-
-### `$watchAsObservable`
-
-> This feature requires using RxJS.
+> This feature requires RxJS.
 
 This is a prototype method added to instances. You can use it to create an observable from a value watcher:
 
