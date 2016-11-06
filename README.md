@@ -52,23 +52,50 @@ Vue.component('foo', {
 })
 ```
 
-#### `$watchAsObservable`
+#### `$watchAsObservable(expOrFn, [options])`
 
 > This feature requires RxJS.
 
 This is a prototype method added to instances. You can use it to create an observable from a value watcher:
 
 ``` js
-created:function () {
-  this.$watchAsObservable('a')
-    .subscribe(function (val) {
-      console.log('stream value', val)
-    },function (err) {
-      console.error(err)
-    },function () {
-      console.log('complete')
-    })
-}
+var vm = new Vue({
+  data: {
+    a: 1
+  },
+  subscriptions () {
+    // declaratively map to another property with Rx operators
+    return {
+      aPlusOne: this.$watchAsObservable('a').map(a => a + 1)
+    }
+  }
+})
+
+// or produce side effects...
+vm.$watchAsObservable('a')
+  .subscribe(
+    val => console.log('stream value', val),
+    err => console.error(err),
+    () => console.log('complete')
+  )
+```
+
+The optional `options` object accepts the same options as `vm.$watch`.
+
+#### `$fromDOMEvent(selector, event)`
+
+> This feature requires RxJS.
+
+This is a prototype method added to instances. Use it to create an observable from DOM events within the instances' element. This is similar to `Rx.Observable.fromEvent`, but usable inside the `subscriptions` function even before the DOM is actually rendered.
+
+``` js
+var vm = new Vue({
+  subscriptions () {
+    return {
+      inputValue: this.$fromDOMEvent('input', 'keyup').pluck('target', 'value')
+    }
+  }
+})
 ```
 
 ### Example

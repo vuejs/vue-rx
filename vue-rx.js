@@ -2,6 +2,18 @@
   function VueRx (Vue, Rx) {
     var warn = Vue.util.warn || function () {}
 
+    function hasRx (vm) {
+      if (!Rx) {
+        warn(
+          '$watchAsObservable requires Rx to be present globally or ' +
+          'be passed to Vue.use() as the second argument.',
+          vm
+        )
+        return false
+      }
+      return true
+    }
+
     function defineReactive (vm, key, val) {
       if (key in vm) {
         vm[key] = val
@@ -59,25 +71,17 @@
     })
 
     Vue.prototype.$watchAsObservable = function (expOrFn, options) {
-      if (!Rx) {
-        warn(
-          '$watchAsObservable requires Rx to be present globally or ' +
-          'be passed to Vue.use() as the second argument.',
-          this
-        )
+      if (!hasRx()) {
         return
       }
 
       var vm = this
       var obs$ = Rx.Observable.create(function (observer) {
-        // Create function to handle old and new Value
-        function listener (newValue, oldValue) {
-          observer.next({ oldValue: oldValue, newValue: newValue })
-        }
-
         var _unwatch
         function watch () {
-          _unwatch = vm.$watch(expOrFn, listener, options)
+          _unwatch = vm.$watch(expOrFn, function (newValue, oldValue) {
+            observer.next({ oldValue: oldValue, newValue: newValue })
+          }, options)
         }
         function unwatch () {
           _unwatch && _unwatch()
@@ -92,6 +96,40 @@
           vm.$once('hook:created', watch)
         }
 
+        // Returns function which disconnects the $watch expression
+        var disposable
+        if (Rx.Subscription) { // Rx5
+          disposable = new Rx.Subscription(unwatch)
+        } else { // Rx4
+          disposable = Rx.Disposable.create(unwatch)
+        }
+        return disposable
+      }).publish().refCount()
+
+      ;(vm._obSubscriptions || (vm._obSubscriptions = [])).push(obs$)
+      return obs$
+    }
+
+    Vue.prototype.$fromDOMEvent = function (selector, event) {
+      if (!hasRx()) {
+        return
+      }
+      if (typeof window === 'undefined') {
+        return Rx.Observable.empty()
+      }
+
+      var vm = this
+      var doc = document.documentElement
+      var obs$ = Rx.Observable.create(function (observer) {
+        function listener (e) {
+          if (vm.$el && vm.$el.querySelector(selector) === e.target) {
+            observer.next(e)
+          }
+        }
+        doc.addEventListener(event, listener)
+        function unwatch () {
+          doc.removeEventListener(event, listener)
+        }
         // Returns function which disconnects the $watch expression
         var disposable
         if (Rx.Subscription) { // Rx5
