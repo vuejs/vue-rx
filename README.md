@@ -116,7 +116,7 @@ You cannot use the `watch` option to watch subscriptions, because it is processe
 
 ### Example
 
-See `/example` for a simple example.
+See `/examples` for some simple examples.
 
 ### License
 
