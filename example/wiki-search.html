@@ -7,7 +7,6 @@
 
 <div id="el">
   <input v-model="search">
-  <p>Reversed search: {{ searchReversed }}</p>
   <div v-if="results">
     <h1>{{ results.term }}</h1>
     <ul v-if="results.matches.length">
@@ -60,10 +59,7 @@ var vm = new Vue({
         .debounceTime(500)
         .distinctUntilChanged()
         .switchMap(fetchTerm)
-        .map(formatResult),
-      searchReversed: this.$fromDOMEvent('input', 'keyup')
-        .pluck('target', 'value')
-        .map(text => text.split('').reverse().join(''))
+        .map(formatResult)
     }
   }
 })</script>
