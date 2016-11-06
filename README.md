@@ -68,7 +68,7 @@ vm.$observables.msg.subscribe(msg => console.log(msg))
 
 > This feature requires RxJS.
 
-This is a prototype method added to instances. You can use it to create an observable from a value watcher:
+This is a prototype method added to instances. You can use it to create an observable from a value watcher. The emitted value is in the format of `{ newValue, oldValue }`:
 
 ``` js
 var vm = new Vue({
@@ -78,7 +78,9 @@ var vm = new Vue({
   subscriptions () {
     // declaratively map to another property with Rx operators
     return {
-      aPlusOne: this.$watchAsObservable('a').map(a => a + 1)
+      aPlusOne: this.$watchAsObservable('a')
+        .pluck('newValue')
+        .map(a => a + 1)
     }
   }
 })
