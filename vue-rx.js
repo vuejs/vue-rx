@@ -10,10 +10,15 @@
       }
     }
 
-    Vue.mixin({
-      created () {
-        var vm = this
-        var obs = vm.$options.subscriptions
+    function init () {
+      var vm = this
+      var dataFn = vm.$options.data
+      var obs = vm.$options.subscriptions
+      if (!obs) return
+
+      // inject initialization into the data fn so that it is called
+      // AFTER props and BEFORE watchers/computed are set up
+      vm.$options.data = function () {
         if (typeof obs === 'function') {
           obs = obs.call(vm)
         }
@@ -23,14 +28,23 @@
           defineReactive(vm, key, undefined)
           var ob = obs[key]
           if (!ob || typeof ob.subscribe !== 'function') {
-            warn('Invalid Observable found in rx option with key "' + key + '".', vm)
+            warn(
+              'Invalid Observable found in subscriptions option with key "' + key + '".',
+              vm
+            )
             return
           }
           vm._rxHandles.push(obs[key].subscribe(function (value) {
             vm[key] = value
           }))
         })
-      },
+        return dataFn ? dataFn() : {}
+      }
+    }
+
+    Vue.mixin({
+      init: init, // 1.x
+      beforeCreate: init, // 2.0
       beforeDestroy: function () {
         if (this._rxHandles) {
           this._rxHandles.forEach(function (handle) {
