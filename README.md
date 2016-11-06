@@ -88,7 +88,7 @@ var vm = new Vue({
 // or produce side effects...
 vm.$watchAsObservable('a')
   .subscribe(
-    val => console.log('stream value', val),
+    ({ newValue, oldValue }) => console.log('stream value', newValue, oldValue),
     err => console.error(err),
     () => console.log('complete')
   )
