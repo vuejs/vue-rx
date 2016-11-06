@@ -52,6 +52,18 @@ Vue.component('foo', {
 })
 ```
 
+The observables exposed as `vm.$observables`:
+
+``` js
+var vm = new Vue({
+  subscriptions: {
+    msg: messageObservable
+  }
+})
+
+vm.$observables.msg.subscribe(msg => console.log(msg))
+```
+
 #### `$watchAsObservable(expOrFn, [options])`
 
 > This feature requires RxJS.
@@ -97,6 +109,10 @@ var vm = new Vue({
   }
 })
 ```
+
+### Caveats
+
+You cannot use the `watch` option to watch subscriptions, because it is processed before the subscriptions are set up. But you can use `$watch` in the `created` hook instead.
 
 ### Example
 
