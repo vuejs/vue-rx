@@ -12,7 +12,7 @@ npm install vue vue-rx rxjs --save
 
 ``` js
 import Vue from 'vue'
-import Rxfrom 'rxjs/Rx'
+import Rx from 'rxjs/Rx'
 import VueRx from 'vue-rx'
 
 // tada!
