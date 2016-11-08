@@ -1,6 +1,6 @@
 # vue-rx
 
-Simple [RxJS](https://github.com/Reactive-Extensions/RxJS) binding for Vue.js. It also supports subscriptions for generic observables that implement the `.subscribe` and `.unsubscribe` (or `.dispise`) interface. For example, you can use it to subscribe to `most.js` or Falcor streams, but some features require RxJS to work.
+Simple [RxJS](https://github.com/Reactive-Extensions/RxJS) binding for Vue.js. It also supports subscriptions for generic observables that implement the `.subscribe` and `.unsubscribe` (or `.dispose`) interface. For example, you can use it to subscribe to `most.js` or Falcor streams, but some features require RxJS to work.
 
 ### Installation
 
