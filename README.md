@@ -27,7 +27,7 @@ In most cases, you probably don't need the full build of Rx. You can reduce the 
 import Vue from 'vue'
 import VueRx from 'vue-rx'
 import { Observable } from 'rxjs/Observable'
-import { Subscription } from 'rxjs/Subscription'
+import { Subscription } from 'rxjs/Subscription' // Disposable if using RxJS4
 
 // tada!
 Vue.use(VueRx, { Observable, Subscription })
