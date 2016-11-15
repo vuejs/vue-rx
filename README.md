@@ -19,6 +19,20 @@ import VueRx from 'vue-rx'
 Vue.use(VueRx, Rx)
 ```
 
+#### Tips for Reducing Bundle Size
+
+In most cases, you probably don't need the full build of Rx. You can reduce the amount of code included in your bundle by doing the following:
+
+``` js
+import Vue from 'vue'
+import VueRx from 'vue-rx'
+import { Observable } from 'rxjs/Observable'
+import { Subscription } from 'rxjs/Subscription'
+
+// tada!
+Vue.use(VueRx, { Observable, Subscription })
+```
+
 #### Global Script
 
 Just make sure to include `vue-rx.js` after Vue.js and RxJS. It will be installed automatically.

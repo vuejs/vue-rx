@@ -105,7 +105,7 @@
         return
       }
       if (typeof window === 'undefined') {
-        return Rx.Observable.empty()
+        return Rx.Observable.create(() => {})
       }
 
       var vm = this
