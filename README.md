@@ -52,7 +52,7 @@ Vue.component('foo', {
 })
 ```
 
-The observables exposed as `vm.$observables`:
+The observables are exposed as `vm.$observables`:
 
 ``` js
 var vm = new Vue({

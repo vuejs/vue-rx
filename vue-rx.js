@@ -94,7 +94,7 @@
           disposable = Rx.Disposable.create(unwatch)
         }
         return disposable
-      }).publish().refCount()
+      })
 
       ;(vm._obSubscriptions || (vm._obSubscriptions = [])).push(obs$)
       return obs$
@@ -128,7 +128,7 @@
           disposable = Rx.Disposable.create(unwatch)
         }
         return disposable
-      }).publish().refCount()
+      })
 
       ;(vm._obSubscriptions || (vm._obSubscriptions = [])).push(obs$)
       return obs$
