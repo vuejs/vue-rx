@@ -110,6 +110,20 @@ vm.$watchAsObservable('a')
 
 The optional `options` object accepts the same options as `vm.$watch`.
 
+#### `$subscribeTo(observable, next, error, complete)`
+
+This is a prototype method added to instances. You can use it to subscribe to an observable, but let VueRx manage the dispose/unsubscribe.
+
+``` js
+var vm = new Vue({
+  mounted () {
+    this.$subscribeTo(Rx.Observable.interval(1000), function (count) {
+      console.log(count)
+    })
+  }
+})
+```
+
 #### `$fromDOMEvent(selector, event)`
 
 > This feature requires RxJS.
