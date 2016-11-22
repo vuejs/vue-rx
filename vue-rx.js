@@ -133,12 +133,12 @@
       ;(vm._obSubscriptions || (vm._obSubscriptions = [])).push(obs$)
       return obs$
     }
-  }
 
-  Vue.prototype.$subscribeTo = function(observable, next, error, complete) {
-    var obs$ = observable.subscribe(next, error, complete)
-    ;(this._obSubscriptions || (this._obSubscriptions = [])).push(obs$)
-    return obs$
+    Vue.prototype.$subscribeTo = function(observable, next, error, complete) {
+      var obs$ = observable.subscribe(next, error, complete)
+      ;(this._obSubscriptions || (this._obSubscriptions = [])).push(obs$)
+      return obs$
+    }
   }
 
   // auto install
