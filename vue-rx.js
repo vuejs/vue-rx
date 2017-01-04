@@ -30,11 +30,11 @@
           obs = obs.call(vm)
         }
         if (!obs) return
-        vm.$subscriptions = {}
+        vm.$observables = {}
         vm._obSubscriptions = []
         Object.keys(obs).forEach(function (key) {
           defineReactive(vm, key, undefined)
-          var ob = vm.$subscriptions[key] = obs[key]
+          var ob = vm.$observables[key] = obs[key]
           if (!ob || typeof ob.subscribe !== 'function') {
             warn(
               'Invalid Observable found in subscriptions option with key "' + key + '".',
