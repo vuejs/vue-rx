@@ -34,6 +34,9 @@
         vm._obSubscriptions = []
         Object.keys(obs).forEach(function (key) {
           defineReactive(vm, key, undefined)
+          if (typeof obs[key] === 'function') {
+            obs[key] = obs[key].call(vm)
+          }
           var ob = vm.$subscriptions[key] = obs[key]
           if (!ob || typeof ob.subscribe !== 'function') {
             warn(
