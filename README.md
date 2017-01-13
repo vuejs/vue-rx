@@ -130,6 +130,8 @@ var vm = new Vue({
 
 This is a prototype method added to instances. Use it to create an observable from DOM events within the instances' element. This is similar to `Rx.Observable.fromEvent`, but usable inside the `subscriptions` function even before the DOM is actually rendered.
 
+`selector` is for finding descendant nodes under the component root element, if you want to listen to events from root element itself, pass `null` as first argument.
+
 ``` js
 var vm = new Vue({
   subscriptions () {
