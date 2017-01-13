@@ -112,7 +112,7 @@
       var doc = document.documentElement
       var obs$ = Rx.Observable.create(function (observer) {
         function listener (e) {
-          if (vm.$el && (selector === vm.$el ? vm.$el : vm.$el.querySelector(selector)) === e.target) {
+          if (vm.$el && (selector === null ? vm.$el : vm.$el.querySelector(selector)) === e.target) {
             observer.next(e)
           }
         }
