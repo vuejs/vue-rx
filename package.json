@@ -1,6 +1,6 @@
 {
   "name": "vue-rx",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "RxJS bindings for Vue",
   "main": "vue-rx.js",
   "files": [
