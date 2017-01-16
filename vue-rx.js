@@ -112,8 +112,12 @@
       var doc = document.documentElement
       var obs$ = Rx.Observable.create(function (observer) {
         function listener (e) {
-          if (vm.$el && (selector === null ? vm.$el : vm.$el.querySelector(selector)) === e.target) {
-            observer.next(e)
+          if (!vm.$el) return;
+          if (selector === null && vm.$el === e.target) return observer.next(e)
+          var els = vm.$el.querySelectorAll(selector);
+          var el = e.target;
+          for (var i = 0, len = els.length; i < len; i++) {
+            if (els[i] === el) return observer.next(e)
           }
         }
         doc.addEventListener(event, listener)
