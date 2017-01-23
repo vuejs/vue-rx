@@ -139,18 +139,6 @@
     }
 
 
-
-    function findVModelName(vnode) {
-      var a= vnode.data.directives.find(function(o) { //Search the vModelName attached to the element
-        return o.name === 'ob';
-      }).value;
-      return a;
-    }
-
-    function setVModelValue(value, vnode) {
-      vnode.context[findVModelName(vnode)] = value;
-    }
-
     Vue.directive('ob', {
 
       bind: function (el, binding, vnode) {
