@@ -153,14 +153,7 @@
               function unwatch () {
                 el.removeEventListener(event, listener)
               }
-              // Returns function which disconnects the $watch expression
-              var disposable
-              if (Rx.Subscription) { // Rx5
-                disposable = new Rx.Subscription(unwatch)
-              } else { // Rx4
-                disposable = Rx.Disposable.create(unwatch)
-              }
-              return disposable
+              return getDisposable(unwatch);
             });
         vnode.context[binding.value] = obs$;
       },
