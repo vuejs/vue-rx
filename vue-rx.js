@@ -13,6 +13,21 @@
       }
       return true
     }
+    function unsub(handle) {
+      if(!handle){return}
+      if (handle.dispose) {
+        handle.dispose()
+      } else if (handle.unsubscribe) {
+        handle.unsubscribe()
+      }
+    }
+    function getDisposable(target) {
+      if (Rx.Subscription) { // Rx5
+        return new Rx.Subscription(target)
+      } else { // Rx4
+        return Rx.Disposable.create(target)
+      }
+    }
 
     function defineReactive (vm, key, val) {
       if (key in vm) {
@@ -49,13 +64,7 @@
       },
       beforeDestroy: function () {
         if (this._obSubscriptions) {
-          this._obSubscriptions.forEach(function (handle) {
-            if (handle.dispose) {
-              handle.dispose()
-            } else if (handle.unsubscribe) {
-              handle.unsubscribe()
-            }
-          })
+          this._obSubscriptions.forEach(unsub)
         }
       }
     })
@@ -87,12 +96,8 @@
         }
 
         // Returns function which disconnects the $watch expression
-        var disposable
-        if (Rx.Subscription) { // Rx5
-          disposable = new Rx.Subscription(unwatch)
-        } else { // Rx4
-          disposable = Rx.Disposable.create(unwatch)
-        }
+        var disposable = getDisposable(unwatch);
+
         return disposable
       })
 
@@ -125,18 +130,60 @@
           doc.removeEventListener(event, listener)
         }
         // Returns function which disconnects the $watch expression
-        var disposable
-        if (Rx.Subscription) { // Rx5
-          disposable = new Rx.Subscription(unwatch)
-        } else { // Rx4
-          disposable = Rx.Disposable.create(unwatch)
-        }
+        var disposable = getDisposable(unwatch)
         return disposable
       })
 
       ;(vm._obSubscriptions || (vm._obSubscriptions = [])).push(obs$)
       return obs$
     }
+
+
+
+    function findVModelName(vnode) {
+      var a= vnode.data.directives.find(function(o) { //Search the vModelName attached to the element
+        return o.name === 'ob';
+      }).value;
+      return a;
+    }
+
+    function setVModelValue(value, vnode) {
+      vnode.context[findVModelName(vnode)] = value;
+    }
+
+    Vue.directive('ob', {
+
+      bind: function (el, binding, vnode) {
+
+        var event = binding.arg;
+
+        var obs$ = Rx.Observable.create(function (observer) {
+              function listener (e) {
+                observer.next(e)
+              }
+              el.addEventListener(event, listener)
+              function unwatch () {
+                el.removeEventListener(event, listener)
+              }
+              // Returns function which disconnects the $watch expression
+              var disposable
+              if (Rx.Subscription) { // Rx5
+                disposable = new Rx.Subscription(unwatch)
+              } else { // Rx4
+                disposable = Rx.Disposable.create(unwatch)
+              }
+              return disposable
+            });
+        vnode.context[binding.value] = obs$;
+      },
+      unbind: function (el, binding, vnode) {
+        var obs$ = vnode.context[binding.value];
+        unsub(obs$);
+      }
+    });
+
+
+
 
     Vue.prototype.$subscribeTo = function(observable, next, error, complete) {
       var obs$ = observable.subscribe(next, error, complete)

@@ -1,0 +1,39 @@
+<script src="https://unpkg.com/@reactivex/rxjs/dist/global/Rx.js"></script>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="../vue-rx.js"></script>
+
+<div id="app">
+  {{ count }}
+  <button v-ob:click="'plus$'" class="plus">+</button>
+  <button v-ob:click="'minus$'" class="minus">-</button>
+</div>
+
+<script>
+new Vue({
+  el: '#app',
+  data:function () {
+    return {
+      count:0
+    }
+  },
+  mounted:function () {
+    var vm = this;
+    var count$ = Rx.Observable.merge(vm.plus$.map(e => 1), vm.minus$.map(e => -1))
+      .startWith(0)
+      .scan((total, change) => total + change)
+      .subscribe((num) => this.count = num)
+  }
+//  subscriptions () {
+//    var vm = this;
+////    var plus$ = this.$fromDOMEvent('.plus', 'click').map(e => 1)
+////    var minus$ = this.$fromDOMEvent('.minus', 'click').map(e => -1)
+//    var count$ = Rx.Observable.merge(vm.plus$.map(e => 1), vm.minus$.map(e => -1))
+//      .startWith(0)
+//      .scan((total, change) => total + change)
+//
+//    return {
+//      count: count$
+//    }
+//  }
+})
+</script>
