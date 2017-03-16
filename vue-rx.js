@@ -145,21 +145,35 @@
     Vue.directive('stream', {
       //Example ./example/counter_dir.html
       bind: function (el, binding, vnode) {
-          var eventName = binding.arg;
-          var vmStream = vnode.context.$observables[binding.expression];
-          if(isObservable(vmStream)){
-			  binding.obs$ = Rx.Observable.fromEvent(el,eventName)
-				  .subscribe(function (evt) {
-					  vmStream.next(evt);
-				  });
-          }else {
-			  warn(
-				  'Invalid Observable found in directive with key "' + binding.expression + '".'
-			  )
-          }
+        if (!hasRx()) {
+          return
+        }
+        var vmStream = vnode.context.$observables[binding.arg];
+        var eventNames = Object.keys(binding.modifiers);
+        function emit(evt) {
+          vmStream.next({
+            event:evt,
+            value:binding.value
+          });
+        }
+
+        if(isObservable(vmStream)){
+          binding.obs$ = eventNames.map(function (evtName) {
+              return Rx.Observable.fromEvent(el,evtName)
+                  .subscribe(emit);
+          })
+        }else{
+          warn(
+              'Invalid Observable found in directive with key "' + binding.expression + '".'
+          )
+        }
       },
       unbind: function (el, binding, vnode) {
-		  binding.obs$ ? unsub(binding.obs$) : '';
+        if(Array.isArray(binding.obs$)){
+          binding.obs$.forEach(function (ob) {
+            unsub(ob)
+          })
+        }
       }
     });
 

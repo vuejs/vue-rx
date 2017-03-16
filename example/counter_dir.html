@@ -3,9 +3,9 @@
 <script src="../vue-rx.js"></script>
 
 <div id="app">
-  {{ count }}
-  <button v-stream:click="plus$" class="plus">+</button>
-  <button v-stream:click="minus$" class="minus">-</button>
+  <div>{{ count }}</div>
+  <button v-stream:plus$.click="delta1" class="plus">+</button>
+  <button v-stream:minus$.click.mousemove="delta2" class="minus">-</button>
 </div>
 
 <script>
@@ -13,7 +13,8 @@ new Vue({
   el: '#app',
   data:function () {
     return {
-
+      delta1:1,
+      delta2:-1
     }
   },
   subscriptions:function () {
@@ -22,7 +23,7 @@ new Vue({
     var plus$ = new Rx.Subject();
     var minus$ = new Rx.Subject();
 
-	  var count$ = Rx.Observable.merge(plus$.map(e => 1), minus$.map(e => -1))
+	  var count$ = Rx.Observable.merge(plus$.map(o => o.value), minus$.map(o => o.value))
           .startWith(0)
           .scan((total, change) => total + change);
 
