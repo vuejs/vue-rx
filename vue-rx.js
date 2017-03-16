@@ -152,7 +152,7 @@
           return
         }
         var streamName = binding.arg;
-        var vmStream = vnode.context.$observables[streamName] || vnode.context[streamName];
+        var vmStream = vnode.context[streamName] || vnode.context.$observables[streamName];
         var eventNames = Object.keys(binding.modifiers);
 
         if(isSubject(vmStream)){

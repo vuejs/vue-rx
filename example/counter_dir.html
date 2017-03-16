@@ -13,6 +13,8 @@ new Vue({
   el: '#app',
   data:function () {
     return {
+      plus$:new Rx.Subject(),
+      minus$:new Rx.Subject(),
       delta1:1,
       delta2:-1
     }
@@ -27,16 +29,11 @@ new Vue({
   subscriptions:function () {
     var vm = this;
 
-    var plus$ = new Rx.Subject();
-    var minus$ = new Rx.Subject();
-
-	  var count$ = Rx.Observable.merge(plus$.map(o => o.data.delta), minus$.map(o => o.data))
-          .startWith(0)
-          .scan((total, change) => total + change);
+    var count$ = Rx.Observable.merge(vm.plus$.map(o => o.data.delta), vm.minus$.map(o => o.data))
+            .startWith(0)
+            .scan((total, change) => total + change);
 
     return {
-		minus$: minus$,
-		plus$: plus$,
 		count:count$
     }
   }
