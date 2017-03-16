@@ -157,12 +157,13 @@
 
         if(isSubject(vmStream)){
           var onNext = (vmStream.next || vmStream.onNext).bind(vmStream); //Rx4 Rx5
-          binding.obs$ = eventNames.map(function (evtName) {
+          el.vStreamData = binding.value;
+          el._obs$ = eventNames.map(function (evtName) {
               return Rx.Observable.fromEvent(el,evtName)
                   .subscribe(function (evt) {
                     onNext({
                       event:evt,
-                      data:binding.value
+                      data:el.vStreamData //Not using binding.value for data updating reason
                     });
                   });
           })
@@ -172,9 +173,12 @@
           )
         }
       },
+      update:function (el, binding, vnode) {
+        el.vStreamData = binding.value;
+      },
       unbind: function (el, binding, vnode) {
-        if(Array.isArray(binding.obs$)){
-          binding.obs$.forEach(function (ob) {
+        if(Array.isArray(el._obs$)){
+          el._obs$.forEach(function (ob) {
             unsub(ob)
           })
         }

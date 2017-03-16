@@ -17,6 +17,13 @@ new Vue({
       delta2:-1
     }
   },
+  created:function () {
+    var vm = this;
+      //Speed up after 10s
+      setTimeout(function () {
+          vm.delta2 = -5;
+      },10*1000);
+  },
   subscriptions:function () {
     var vm = this;
 
