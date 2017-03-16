@@ -4,8 +4,8 @@
 
 <div id="app">
   <div>{{ count }}</div>
-  <button v-stream:plus$.click="delta1" class="plus">+</button>
-  <button v-stream:minus$.click.mousemove="delta2" class="minus">-</button>
+  <button v-stream:plus$.click="{delta:delta1}" class="plus">Add on Click</button>
+  <button v-stream:minus$.click.mousemove="delta2" class="minus">Minus on Click & Mousemove</button>
 </div>
 
 <script>
@@ -23,7 +23,7 @@ new Vue({
     var plus$ = new Rx.Subject();
     var minus$ = new Rx.Subject();
 
-	  var count$ = Rx.Observable.merge(plus$.map(o => o.value), minus$.map(o => o.value))
+	  var count$ = Rx.Observable.merge(plus$.map(o => o.data.delta), minus$.map(o => o.data))
           .startWith(0)
           .scan((total, change) => total + change);
 

@@ -16,6 +16,9 @@
     function isObservable(ob) {
       return ob && typeof ob.subscribe === 'function';
 	}
+    function isSubject(subject) {
+      return subject && (typeof subject.next === 'function' || typeof subject.onNext === 'function');
+    }
     function unsub(handle) {
       if(!handle){return}
       if (handle.dispose) {
@@ -148,23 +151,24 @@
         if (!hasRx()) {
           return
         }
-        var vmStream = vnode.context.$observables[binding.arg];
+        var streamName = binding.arg;
+        var vmStream = vnode.context.$observables[streamName] || vnode.context[streamName];
         var eventNames = Object.keys(binding.modifiers);
-        function emit(evt) {
-          vmStream.next({
-            event:evt,
-            value:binding.value
-          });
-        }
 
-        if(isObservable(vmStream)){
+        if(isSubject(vmStream)){
+          var onNext = (vmStream.next || vmStream.onNext).bind(vmStream); //Rx4 Rx5
           binding.obs$ = eventNames.map(function (evtName) {
               return Rx.Observable.fromEvent(el,evtName)
-                  .subscribe(emit);
+                  .subscribe(function (evt) {
+                    onNext({
+                      event:evt,
+                      data:binding.value
+                    });
+                  });
           })
         }else{
           warn(
-              'Invalid Observable found in directive with key "' + binding.expression + '".'
+              'Invalid Subject found in directive with key "' + streamName + '".' + 'Please declare ' + streamName + ' as an new Rx.Subject'
           )
         }
       },
