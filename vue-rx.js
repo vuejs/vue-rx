@@ -13,6 +13,9 @@
       }
       return true
     }
+    function isObservable(ob) {
+      return ob && typeof ob.subscribe === 'function';
+	}
     function unsub(handle) {
       if(!handle){return}
       if (handle.dispose) {
@@ -50,7 +53,7 @@
         Object.keys(obs).forEach(function (key) {
           defineReactive(vm, key, undefined)
           var ob = vm.$observables[key] = obs[key]
-          if (!ob || typeof ob.subscribe !== 'function') {
+          if (!isObservable(ob)) {
             warn(
               'Invalid Observable found in subscriptions option with key "' + key + '".',
               vm
@@ -139,27 +142,24 @@
     }
 
 
-    Vue.directive('ob', {
-
+    Vue.directive('stream', {
+      //Example ./example/counter_dir.html
       bind: function (el, binding, vnode) {
-
-        var event = binding.arg;
-
-        var obs$ = Rx.Observable.create(function (observer) {
-              function listener (e) {
-                observer.next(e)
-              }
-              el.addEventListener(event, listener)
-              function unwatch () {
-                el.removeEventListener(event, listener)
-              }
-              return getDisposable(unwatch);
-            });
-        vnode.context[binding.value] = obs$;
+          var eventName = binding.arg;
+          var vmStream = vnode.context.$observables[binding.expression];
+          if(isObservable(vmStream)){
+			  binding.obs$ = Rx.Observable.fromEvent(el,eventName)
+				  .subscribe(function (evt) {
+					  vmStream.next(evt);
+				  });
+          }else {
+			  warn(
+				  'Invalid Observable found in directive with key "' + binding.expression + '".'
+			  )
+          }
       },
       unbind: function (el, binding, vnode) {
-        var obs$ = vnode.context[binding.value];
-        unsub(obs$);
+		  binding.obs$ ? unsub(binding.obs$) : '';
       }
     });
 
