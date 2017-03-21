@@ -189,8 +189,6 @@ var vm = new Vue({
 
 #### `$fromDOMEvent(selector, event)`
 
-> Deprecated in 3.0+. Prefer `v-stream` instead.
-
 > This feature requires RxJS.
 
 This is a prototype method added to instances. Use it to create an observable from DOM events within the instances' element. This is similar to `Rx.Observable.fromEvent`, but usable inside the `subscriptions` function even before the DOM is actually rendered.
