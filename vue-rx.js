@@ -53,27 +53,35 @@
     Vue.mixin({
       created: function init () {
         var vm = this
+        var domStreams = vm.$option.domStreams
+        if (domStreams) {
+          domStreams.forEach(function (key) {
+            vm[key] = new Rx.Subject()
+          })
+        }
+
         var obs = vm.$options.subscriptions
         if (typeof obs === 'function') {
           obs = obs.call(vm)
         }
-        if (!obs) return
-        vm.$observables = {}
-        vm._obSubscriptions = []
-        Object.keys(obs).forEach(function (key) {
-          defineReactive(vm, key, undefined)
-          var ob = vm.$observables[key] = obs[key]
-          if (!isObservable(ob)) {
-            warn(
-              'Invalid Observable found in subscriptions option with key "' + key + '".',
-              vm
-            )
-            return
-          }
-          vm._obSubscriptions.push(obs[key].subscribe(function (value) {
-            vm[key] = value
-          }))
-        })
+        if (obs) {
+          vm.$observables = {}
+          vm._obSubscriptions = []
+          Object.keys(obs).forEach(function (key) {
+            defineReactive(vm, key, undefined)
+            var ob = vm.$observables[key] = obs[key]
+            if (!isObservable(ob)) {
+              warn(
+                'Invalid Observable found in subscriptions option with key "' + key + '".',
+                vm
+              )
+              return
+            }
+            vm._obSubscriptions.push(obs[key].subscribe(function (value) {
+              vm[key] = value
+            }))
+          })
+        }
       },
       beforeDestroy: function () {
         if (this._obSubscriptions) {
@@ -157,37 +165,26 @@
         if (!hasRx()) {
           return
         }
-        var streamName = binding.arg
-        var vmStream = vnode.context[streamName] || vnode.context.$observables[streamName]
-        var eventNames = Object.keys(binding.modifiers)
+        var event = binding.arg
+        var stream = binding.value
+        var streamName = binding.expression
 
-        if (isSubject(vmStream)) {
-          var onNext = (vmStream.next || vmStream.onNext).bind(vmStream) // Rx4 Rx5
-          el.vStreamData = binding.value
-          el._obs$ = eventNames.map(function (evtName) {
-            return Rx.Observable.fromEvent(el, evtName)
-              .subscribe(function (evt) {
-                onNext({
-                  event: evt,
-                  data: el.vStreamData // Not using binding.value for data updating reason
-                })
-              })
+        if (isSubject(stream)) {
+          var onNext = (stream.next || stream.onNext).bind(stream) // Rx4 Rx5
+          el._ob$ = Rx.Observable.fromEvent(el, event).subscribe(function (evt) {
+            onNext({ event: evt })
           })
         } else {
           warn(
             'Invalid Subject found in directive with key "' + streamName + '".' +
-            'Please declare ' + streamName + ' as an new Rx.Subject'
+            streamName + ' should be an instance of Rx.Subject',
+            vnode.context
           )
         }
       },
-      update: function (el, binding, vnode) {
-        el.vStreamData = binding.value
-      },
       unbind: function (el, binding, vnode) {
-        if (Array.isArray(el._obs$)) {
-          el._obs$.forEach(function (ob) {
-            unsub(ob)
-          })
+        if (el._ob$) {
+          unsub(el._ob$)
         }
       }
     })
