@@ -13,21 +13,28 @@
       }
       return true
     }
-    function isObservable(ob) {
-      return ob && typeof ob.subscribe === 'function';
-	}
-    function isSubject(subject) {
-      return subject && (typeof subject.next === 'function' || typeof subject.onNext === 'function');
+
+    function isObservable (ob) {
+      return ob && typeof ob.subscribe === 'function'
     }
-    function unsub(handle) {
-      if(!handle){return}
+
+    function isSubject (subject) {
+      return subject && (
+        typeof subject.next === 'function' ||
+        typeof subject.onNext === 'function'
+      )
+    }
+
+    function unsub (handle) {
+      if (!handle) { return }
       if (handle.dispose) {
         handle.dispose()
       } else if (handle.unsubscribe) {
         handle.unsubscribe()
       }
     }
-    function getDisposable(target) {
+
+    function getDisposable (target) {
       if (Rx.Subscription) { // Rx5
         return new Rx.Subscription(target)
       } else { // Rx4
@@ -102,7 +109,7 @@
         }
 
         // Returns function which disconnects the $watch expression
-        var disposable = getDisposable(unwatch);
+        var disposable = getDisposable(unwatch)
 
         return disposable
       })
@@ -123,10 +130,10 @@
       var doc = document.documentElement
       var obs$ = Rx.Observable.create(function (observer) {
         function listener (e) {
-          if (!vm.$el) return;
+          if (!vm.$el) return
           if (selector === null && vm.$el === e.target) return observer.next(e)
-          var els = vm.$el.querySelectorAll(selector);
-          var el = e.target;
+          var els = vm.$el.querySelectorAll(selector)
+          var el = e.target
           for (var i = 0, len = els.length; i < len; i++) {
             if (els[i] === el) return observer.next(e)
           }
@@ -144,51 +151,48 @@
       return obs$
     }
 
-
     Vue.directive('stream', {
-      //Example ./example/counter_dir.html
+      // Example ./example/counter_dir.html
       bind: function (el, binding, vnode) {
         if (!hasRx()) {
           return
         }
-        var streamName = binding.arg;
-        var vmStream = vnode.context[streamName] || vnode.context.$observables[streamName];
-        var eventNames = Object.keys(binding.modifiers);
+        var streamName = binding.arg
+        var vmStream = vnode.context[streamName] || vnode.context.$observables[streamName]
+        var eventNames = Object.keys(binding.modifiers)
 
-        if(isSubject(vmStream)){
-          var onNext = (vmStream.next || vmStream.onNext).bind(vmStream); //Rx4 Rx5
-          el.vStreamData = binding.value;
+        if (isSubject(vmStream)) {
+          var onNext = (vmStream.next || vmStream.onNext).bind(vmStream) // Rx4 Rx5
+          el.vStreamData = binding.value
           el._obs$ = eventNames.map(function (evtName) {
-              return Rx.Observable.fromEvent(el,evtName)
-                  .subscribe(function (evt) {
-                    onNext({
-                      event:evt,
-                      data:el.vStreamData //Not using binding.value for data updating reason
-                    });
-                  });
+            return Rx.Observable.fromEvent(el, evtName)
+              .subscribe(function (evt) {
+                onNext({
+                  event: evt,
+                  data: el.vStreamData // Not using binding.value for data updating reason
+                })
+              })
           })
-        }else{
+        } else {
           warn(
-              'Invalid Subject found in directive with key "' + streamName + '".' + 'Please declare ' + streamName + ' as an new Rx.Subject'
+            'Invalid Subject found in directive with key "' + streamName + '".' +
+            'Please declare ' + streamName + ' as an new Rx.Subject'
           )
         }
       },
-      update:function (el, binding, vnode) {
-        el.vStreamData = binding.value;
+      update: function (el, binding, vnode) {
+        el.vStreamData = binding.value
       },
       unbind: function (el, binding, vnode) {
-        if(Array.isArray(el._obs$)){
+        if (Array.isArray(el._obs$)) {
           el._obs$.forEach(function (ob) {
             unsub(ob)
           })
         }
       }
-    });
+    })
 
-
-
-
-    Vue.prototype.$subscribeTo = function(observable, next, error, complete) {
+    Vue.prototype.$subscribeTo = function (observable, next, error, complete) {
       var obs$ = observable.subscribe(next, error, complete)
       ;(this._obSubscriptions || (this._obSubscriptions = [])).push(obs$)
       return obs$
