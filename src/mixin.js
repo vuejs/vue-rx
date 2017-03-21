@@ -1,4 +1,4 @@
-import { Rx, defineReactive, isObservable } from './util'
+import { Rx, defineReactive, isObservable, warn, unsub } from './util'
 
 export default {
   created () {
