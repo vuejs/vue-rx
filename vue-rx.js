@@ -26,7 +26,7 @@
     }
 
     function unsub (handle) {
-      if (!handle) { return }
+      if (!handle) return
       if (handle.dispose) {
         handle.dispose()
       } else if (handle.unsubscribe) {
@@ -50,14 +50,22 @@
       }
     }
 
+    function getKey (binding) {
+      return [binding.arg].concat(Object.keys(binding.modifiers)).join(':')
+    }
+
     Vue.mixin({
       created: function init () {
         var vm = this
-        var domStreams = vm.$option.domStreams
+        var domStreams = vm.$options.domStreams
         if (domStreams) {
-          domStreams.forEach(function (key) {
-            vm[key] = new Rx.Subject()
-          })
+          if (!Rx.Subject) {
+            warn('Rx.Subject is required to use the "domStreams" option.')
+          } else {
+            domStreams.forEach(function (key) {
+              vm[key] = new Rx.Subject()
+            })
+          }
         }
 
         var obs = vm.$options.subscriptions
@@ -83,6 +91,7 @@
           })
         }
       },
+
       beforeDestroy: function () {
         if (this._obSubscriptions) {
           this._obSubscriptions.forEach(unsub)
@@ -165,26 +174,51 @@
         if (!hasRx()) {
           return
         }
+
+        var handle = binding.value
         var event = binding.arg
-        var stream = binding.value
         var streamName = binding.expression
 
-        if (isSubject(stream)) {
-          var onNext = (stream.next || stream.onNext).bind(stream) // Rx4 Rx5
-          el._ob$ = Rx.Observable.fromEvent(el, event).subscribe(function (evt) {
-            onNext({ event: evt })
-          })
-        } else {
+        if (isSubject(handle)) {
+          handle = { subject: handle }
+        } else if (!handle || !isSubject(handle.subject)) {
           warn(
             'Invalid Subject found in directive with key "' + streamName + '".' +
-            streamName + ' should be an instance of Rx.Subject',
+            streamName + ' should be an instance of Rx.Subject or have the ' +
+            'type { subject: Rx.Subject, data: any }.',
             vnode.context
           )
+          return
+        }
+
+        var subject = handle.subject
+        var next = (subject.next || subject.onNext).bind(subject)
+        handle.subscription = Rx.Observable.fromEvent(el, event).subscribe(function (e) {
+          next({
+            event: e,
+            data: handle.data
+          })
+        })
+
+        // store handle on element with a unique key for identifying
+        // multiple v-stream directives on the same node
+        ;(el._rxHandles || (el._rxHandles = {}))[getKey(binding)] = handle
+      },
+
+      update: function (el, binding) {
+        var handle = binding.value
+        var _handle = el._rxHandles && el._rxHandles[getKey(binding)]
+        if (_handle && handle && isSubject(handle.subject)) {
+          _handle.data = handle.data
         }
       },
-      unbind: function (el, binding, vnode) {
-        if (el._ob$) {
-          unsub(el._ob$)
+
+      unbind: function (el, binding) {
+        var key = getKey(binding)
+        var handle = el._rxHandles && el._rxHandles[key]
+        if (handle) {
+          unsub(handle.subscription)
+          el._rxHandles[key] = null
         }
       }
     })

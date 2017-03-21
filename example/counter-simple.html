@@ -1,0 +1,31 @@
+<script src="https://unpkg.com/@reactivex/rxjs/dist/global/Rx.js"></script>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="../vue-rx.js"></script>
+
+<div id="app">
+  <div>{{ count }}</div>
+  <button v-stream:click="plus$">+</button>
+  <button v-stream:click="minus$">-</button>
+</div>
+
+<script>
+new Vue({
+  el: '#app',
+
+  // declare dom stream Subjects
+  domStreams: ['plus$', 'minus$'],
+
+  subscriptions () {
+    var plus$ = this.plus$.map(() => 1)
+    var minus$ = this.minus$.map(() => -1)
+    var count$ = Rx.Observable
+      .merge(plus$, minus$)
+      .startWith(0)
+      .scan((total, change) => total + change)
+
+    return {
+      count: count$
+    }
+  }
+})
+</script>

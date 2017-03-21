@@ -28,9 +28,14 @@ import Vue from 'vue'
 import VueRx from 'vue-rx'
 import { Observable } from 'rxjs/Observable'
 import { Subscription } from 'rxjs/Subscription' // Disposable if using RxJS4
+import { Subject } from 'rxjs/Subject' // required for domStreams option
 
 // tada!
-Vue.use(VueRx, { Observable, Subscription })
+Vue.use(VueRx, {
+  Observable,
+  Subscription,
+  Subject
+})
 ```
 
 #### Global Script
@@ -77,6 +82,64 @@ var vm = new Vue({
 
 vm.$observables.msg.subscribe(msg => console.log(msg))
 ```
+
+### `v-stream`: Streaming DOM Events
+
+> New in 3.0
+
+> This feature requires RxJS.
+
+`vue-rx` provides the `v-stream` directive which allows you to stream DOM events to an Rx Subject. The syntax is similar to `v-on` where the directive argument is the event name, and the binding value is the target Rx Subject.
+
+``` html
+<button v-stream:click="plus$">+</button>
+```
+
+Note that you need to declare `plus$` as an instance of `Rx.Subject` on the vm instance before the render happens, just like you need to declare data. You can do that right in the `subscriptions` function:
+
+``` js
+new Vue({
+  subscriptions () {
+    // declare the receiving Subjects
+    this.plus$ = new Rx.Subject()
+    // ...then create subscriptions using the Subjects as source stream.
+    // the source stream emits in the form of { event: HTMLEvent, data?: any }
+    return {
+      count: this.plus$.map(() => 1)
+        .startWith(0)
+        .scan((total, change) => total + change)
+    }
+  }
+})
+```
+
+Or, use the `domStreams` convenience option:
+
+``` js
+new Vue({
+  // requires `Rx` passed to Vue.use() to expose `Subject`
+  domStreams: ['plus$'],
+  subscriptions () {
+    // use this.plus$
+  }
+})
+```
+
+Finally, you can pass additional data to the stream using the alternative syntax:
+
+``` html
+<button v-stream:click="{ subject: plus$, data: someData }">+</button>
+```
+
+This is useful when you need to pass along temporary variables like `v-for` iterators. You can get the data by simply plucking it from the source stream:
+
+``` js
+const plusData$ = this.plus$.pluck('data')
+```
+
+See [example](https://github.com/vuejs/vue-rx/blob/master/example/counter.html) for actual usage.
+
+### Other API Methods
 
 #### `$watchAsObservable(expOrFn, [options])`
 
@@ -125,6 +188,8 @@ var vm = new Vue({
 ```
 
 #### `$fromDOMEvent(selector, event)`
+
+> Deprecated in 3.0+. Prefer `v-stream` instead.
 
 > This feature requires RxJS.
 
