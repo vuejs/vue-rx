@@ -23,9 +23,9 @@ export default {
       return
     } else if (!Rx.Observable.fromEvent) {
       warn(
-        `No 'fromEvent' method on Observable class` +
-        `v-stream directive requires Rx.Observable.fromEvent method` +
-        `try import 'rxjs/add/observable/fromEvent' for ${streamName}`,
+        `No 'fromEvent' method on Observable class. ` +
+        `v-stream directive requires Rx.Observable.fromEvent method. ` +
+        `Try import 'rxjs/add/observable/fromEvent' for ${streamName}`,
         vnode.context
       )
       return
