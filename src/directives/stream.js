@@ -21,7 +21,7 @@ export default {
         vnode.context
       )
       return
-    }else if(!Rx.Observable.fromEvent){
+    } else if (!Rx.Observable.fromEvent) {
       warn(
         `No 'fromEvent' method on Observable class` +
         `v-stream directive requires Rx.Observable.fromEvent method` +
