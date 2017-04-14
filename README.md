@@ -137,6 +137,16 @@ This is useful when you need to pass along temporary variables like `v-for` iter
 const plusData$ = this.plus$.pluck('data')
 ```
 
+Starting in 3.1 you can also pass along extra options (passed along to native `addEventListener` as the 3rd argument):
+
+``` html
+<button v-stream:click="{
+  subject: plus$,
+  data: someData,
+  options: { once: true, passive: true, capture: true }
+}">+</button>
+```
+
 See [example](https://github.com/vuejs/vue-rx/blob/master/example/counter.html) for actual usage.
 
 ### Other API Methods
