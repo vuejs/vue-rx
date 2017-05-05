@@ -3,17 +3,16 @@ const Vue = require('vue/dist/vue.js')
 const VueRx = require('../dist/vue-rx.js')
 
 //library
-const Observable = require('rxjs/Observable').Observable;
-const Subject = require('rxjs/Subject').Subject;
-const Subscription = require('rxjs/Subscription').Subscription;
-require('rxjs/add/observable/fromEvent');
+const Observable = require('rxjs/Observable').Observable
+const Subject = require('rxjs/Subject').Subject
+const Subscription = require('rxjs/Subscription').Subscription
+require('rxjs/add/observable/fromEvent')
 
 //user
-require('rxjs/add/operator/map');
-require('rxjs/add/operator/startWith');
-require('rxjs/add/operator/scan');
-require('rxjs/add/operator/pluck');
-
+require('rxjs/add/operator/map')
+require('rxjs/add/operator/startWith')
+require('rxjs/add/operator/scan')
+require('rxjs/add/operator/pluck')
 
 const miniRx = {
   Observable,
