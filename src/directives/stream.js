@@ -11,6 +11,15 @@ export default {
     const event = binding.arg
     const streamName = binding.expression
 
+    if (!Rx.Observable.fromEvent) {
+      warn(
+        `No 'fromEvent' method on Observable class. ` +
+        `v-stream directive requires Rx.Observable.fromEvent method. ` +
+        `Try import 'rxjs/add/observable/fromEvent' for ${streamName}`,
+        vnode.context
+      )
+      return
+    }
     if (isSubject(handle)) {
       handle = { subject: handle }
     } else if (!handle || !isSubject(handle.subject)) {
@@ -18,14 +27,6 @@ export default {
         'Invalid Subject found in directive with key "' + streamName + '".' +
         streamName + ' should be an instance of Rx.Subject or have the ' +
         'type { subject: Rx.Subject, data: any }.',
-        vnode.context
-      )
-      return
-    } else if (!Rx.Observable.fromEvent) {
-      warn(
-        `No 'fromEvent' method on Observable class. ` +
-        `v-stream directive requires Rx.Observable.fromEvent method. ` +
-        `Try import 'rxjs/add/observable/fromEvent' for ${streamName}`,
         vnode.context
       )
       return
