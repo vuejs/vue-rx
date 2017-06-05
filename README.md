@@ -183,6 +183,30 @@ vm.$watchAsObservable('a')
 
 The optional `options` object accepts the same options as `vm.$watch`.
 
+#### `$eventToObservable(event)`
+
+> This feature requires RxJS.
+
+Convert vue.$on (including lifecycle events) to Observables. The emitted value is in the format of `{ name, msg }`:
+
+``` js
+var vm = new Vue({
+  created () {
+    this.$eventToObservable('customEvent')
+	  .subscribe((event) => console.log(event.name,event.msg))	
+  }
+})
+
+// vm.$once vue-rx version
+this.$eventToObservable('customEvent')
+  .take(1)
+  
+// Another way to auto unsub:
+let beforeDestroy$ = this.$eventToObservable('hook:beforeDestroy')
+this.$eventToObservable('customEvent')
+  .takeUntil(beforeDestroy$)
+```
+
 #### `$subscribeTo(observable, next, error, complete)`
 
 This is a prototype method added to instances. You can use it to subscribe to an observable, but let VueRx manage the dispose/unsubscribe.
