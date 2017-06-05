@@ -202,7 +202,7 @@ this.$eventToObservable('customEvent')
   .take(1)
   
 // Another way to auto unsub:
-let beforeDestroy$ = this.$eventToObservable('hook:beforeDestroy')
+let beforeDestroy$ = this.$eventToObservable('hook:beforeDestroy').take(1)
 this.$eventToObservable('customEvent')
   .takeUntil(beforeDestroy$)
 ```
