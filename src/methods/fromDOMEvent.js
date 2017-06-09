@@ -27,6 +27,5 @@ export default function fromDOMEvent (selector, event) {
     })
   })
 
-  ;(vm._obSubscriptions || (vm._obSubscriptions = [])).push(obs$)
   return obs$
 }

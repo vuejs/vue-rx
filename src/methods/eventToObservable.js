@@ -23,6 +23,5 @@ export default function eventToObservable (evtName) {
     }
   })
 
-  ;(vm._obSubscriptions || (vm._obSubscriptions = [])).push(obs$)
   return obs$
 }
