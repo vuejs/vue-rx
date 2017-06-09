@@ -315,7 +315,6 @@ test('$eventToObservable() with lifecycle hooks', done => {
     created(){
       this.$eventToObservable('hook:beforeDestroy')
         .subscribe(function (event) {
-          console.log(event);
           done(event)
         });
     }

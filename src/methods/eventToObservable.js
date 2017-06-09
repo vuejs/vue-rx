@@ -12,13 +12,13 @@ export default function eventToObservable (evtName) {
   const vm = this
   let evtNames = Array.isArray(evtName) ? evtName : [evtName]
   const obs$ = Rx.Observable.create(observer => {
-    let eventPairs = evtNames.map(name =>{
+    let eventPairs = evtNames.map(name => {
       let callback = msg => observer.next({name, msg})
       vm.$on(name, callback)
       return {name, callback}
     })
     return () => {
-      //Only remove the specific callback
+      // Only remove the specific callback
       eventPairs.forEach(pair => vm.$off(pair.name, pair.callback))
     }
   })

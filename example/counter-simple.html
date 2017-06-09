@@ -6,20 +6,31 @@
   <div>{{ count }}</div>
   <button v-stream:click="plus$">+</button>
   <button v-stream:click="minus$">-</button>
+  <my-component v-stream:more="more$"></my-component>
 </div>
 
 <script>
+Vue.component('my-component', {
+  template: '<button v-on:click="more">Iwant more!</button>',
+  methods:{
+    more:function(){
+      this.$emit('more',100)
+    }
+  }
+})
+
 new Vue({
   el: '#app',
 
   // declare dom stream Subjects
-  domStreams: ['plus$', 'minus$'],
+  domStreams: ['plus$', 'minus$','more$'],
 
   subscriptions () {
     var plus$ = this.plus$.map(() => 1)
     var minus$ = this.minus$.map(() => -1)
+    var more$ = this.more$.map(() => 100)
     var count$ = Rx.Observable
-      .merge(plus$, minus$)
+      .merge(plus$, minus$, more$)
       .startWith(0)
       .scan((total, change) => total + change)
 

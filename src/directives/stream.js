@@ -11,15 +11,6 @@ export default {
     const event = binding.arg
     const streamName = binding.expression
 
-    if (!Rx.Observable.fromEvent) {
-      warn(
-        `No 'fromEvent' method on Observable class. ` +
-        `v-stream directive requires Rx.Observable.fromEvent method. ` +
-        `Try import 'rxjs/add/observable/fromEvent' for ${streamName}`,
-        vnode.context
-      )
-      return
-    }
     if (isSubject(handle)) {
       handle = { subject: handle }
     } else if (!handle || !isSubject(handle.subject)) {
@@ -34,17 +25,36 @@ export default {
 
     const subject = handle.subject
     const next = (subject.next || subject.onNext).bind(subject)
-    let fromEventArgs = handle.options ? [el, event, handle.options] : [el, event]
-    handle.subscription = Rx.Observable.fromEvent(...fromEventArgs).subscribe(e => {
-      next({
-        event: e,
-        data: handle.data
-      })
-    })
 
-    // store handle on element with a unique key for identifying
-    // multiple v-stream directives on the same node
-    ;(el._rxHandles || (el._rxHandles = {}))[getKey(binding)] = handle
+    if (vnode.componentInstance) {
+      handle.subscription = vnode.componentInstance.$eventToObservable(event).subscribe(e => {
+        next({
+          event: e,
+          data: handle.data
+        })
+      })
+    } else {
+      if (!Rx.Observable.fromEvent) {
+        warn(
+          `No 'fromEvent' method on Observable class. ` +
+          `v-stream directive requires Rx.Observable.fromEvent method. ` +
+          `Try import 'rxjs/add/observable/fromEvent' for ${streamName}`,
+          vnode.context
+        )
+        return
+      }
+      let fromEventArgs = handle.options ? [el, event, handle.options] : [el, event]
+      handle.subscription = Rx.Observable.fromEvent(...fromEventArgs).subscribe(e => {
+        next({
+          event: e,
+          data: handle.data
+        })
+      })
+
+      // store handle on element with a unique key for identifying
+      // multiple v-stream directives on the same node
+      ;(el._rxHandles || (el._rxHandles = {}))[getKey(binding)] = handle
+    }
   },
 
   update (el, binding) {
