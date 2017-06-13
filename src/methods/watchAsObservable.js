@@ -29,6 +29,5 @@ export default function watchAsObservable (expOrFn, options) {
     })
   })
 
-  ;(vm._obSubscriptions || (vm._obSubscriptions = [])).push(obs$)
   return obs$
 }

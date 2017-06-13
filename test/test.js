@@ -284,3 +284,42 @@ test('$subscribeTo()', () => {
   next(2)
   expect(results).toEqual([1]) // should not trigger anymore
 })
+
+
+test('$eventToObservable()', done => {
+  let calls = 0;
+  const vm = new Vue({
+    created(){
+      let ob = this.$eventToObservable('ping')
+        .subscribe(function (event) {
+          expect(event.name).toEqual('ping');
+          expect(event.msg).toEqual('ping message');
+          calls++
+        });
+    }
+  });
+  vm.$emit('ping','ping message');
+
+  nextTick(()=>{
+    vm.$destroy();
+    //Should not emit
+    vm.$emit('pong','pong message');
+    expect(calls).toEqual(1);
+    done()
+  });
+});
+
+
+test('$eventToObservable() with lifecycle hooks', done => {
+  const vm = new Vue({
+    created(){
+      this.$eventToObservable('hook:beforeDestroy')
+        .subscribe(function (event) {
+          done(event)
+        });
+    }
+  });
+  nextTick(()=>{
+    vm.$destroy()
+  })
+});
