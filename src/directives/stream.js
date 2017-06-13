@@ -43,7 +43,7 @@ export default {
         )
         return
       }
-      let fromEventArgs = handle.options ? [el, event, handle.options] : [el, event]
+      const fromEventArgs = handle.options ? [el, event, handle.options] : [el, event]
       handle.subscription = Rx.Observable.fromEvent(...fromEventArgs).subscribe(e => {
         next({
           event: e,

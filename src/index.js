@@ -1,3 +1,5 @@
+/* global Vue, Rx */
+
 import { install } from './util'
 import rxMixin from './mixin'
 import streamDirective from './directives/stream'

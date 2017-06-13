@@ -10,7 +10,6 @@
   <!-- simple usage -->
   <button v-stream:click="plus$">Add on Click</button>
 
-
   <button v-stream:click="{ subject: plus$, data: minusDelta1, options:{once:true} }">Add on Click (Option once:true)</button>
 
   <!-- you can also stream to the same subject with different events/data -->
@@ -21,6 +20,8 @@
   </button>
 
   <pre>{{ $data }}</pre>
+
+  <my-button v-stream:click="plus$"></my-button>
 </div>
 
 <script>
@@ -31,6 +32,12 @@ new Vue({
     return {
       minusDelta1: -1,
       minusDelta2: -1
+    }
+  },
+
+  components: {
+    myButton: {
+      template: '<button>MyButton</button>'
     }
   },
 

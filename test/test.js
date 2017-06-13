@@ -1,14 +1,17 @@
+/* eslint-env jest */
+
 'use strict'
+
 const Vue = require('vue/dist/vue.js')
 const VueRx = require('../dist/vue-rx.js')
 
-//library
+// library
 const Observable = require('rxjs/Observable').Observable
 const Subject = require('rxjs/Subject').Subject
 const Subscription = require('rxjs/Subscription').Subscription
 require('rxjs/add/observable/fromEvent')
 
-//user
+// user
 require('rxjs/add/operator/map')
 require('rxjs/add/operator/startWith')
 require('rxjs/add/operator/scan')
@@ -88,7 +91,7 @@ test('bind subscriptions to render', done => {
 })
 
 test('subscriptions() has access to component state', () => {
-  const { ob, next } = mock()
+  const { ob } = mock()
 
   const vm = new Vue({
     data: {
@@ -112,8 +115,6 @@ test('subscriptions() has access to component state', () => {
 })
 
 test('v-stream directive (basic)', done => {
-  const { ob, next } = mock()
-
   const vm = new Vue({
     template: `
       <div>
@@ -128,7 +129,7 @@ test('v-stream directive (basic)', done => {
           .startWith(0)
           .scan((total, change) => total + change)
       }
-    },
+    }
   }).$mount()
 
   expect(vm.$el.querySelector('span').textContent).toBe('0')
@@ -140,8 +141,6 @@ test('v-stream directive (basic)', done => {
 })
 
 test('v-stream directive (with data)', done => {
-  const { ob, next } = mock()
-
   const vm = new Vue({
     data: {
       delta: -1
@@ -159,7 +158,7 @@ test('v-stream directive (with data)', done => {
           .startWith(0)
           .scan((total, change) => total + change)
       }
-    },
+    }
   }).$mount()
 
   expect(vm.$el.querySelector('span').textContent).toBe('0')
@@ -178,8 +177,6 @@ test('v-stream directive (with data)', done => {
 })
 
 test('v-stream directive (multiple bindings on same node)', done => {
-  const { ob, next } = mock()
-
   const vm = new Vue({
     template: `
       <div>
@@ -196,7 +193,7 @@ test('v-stream directive (multiple bindings on same node)', done => {
           .startWith(0)
           .scan((total, change) => total + change)
       }
-    },
+    }
   }).$mount()
 
   expect(vm.$el.querySelector('span').textContent).toBe('0')
@@ -212,8 +209,6 @@ test('v-stream directive (multiple bindings on same node)', done => {
 })
 
 test('$fromDOMEvent()', done => {
-  const { ob, next } = mock()
-
   const vm = new Vue({
     template: `
       <div>
@@ -285,41 +280,39 @@ test('$subscribeTo()', () => {
   expect(results).toEqual([1]) // should not trigger anymore
 })
 
-
 test('$eventToObservable()', done => {
-  let calls = 0;
+  let calls = 0
   const vm = new Vue({
-    created(){
-      let ob = this.$eventToObservable('ping')
+    created () {
+      this.$eventToObservable('ping')
         .subscribe(function (event) {
-          expect(event.name).toEqual('ping');
-          expect(event.msg).toEqual('ping message');
+          expect(event.name).toEqual('ping')
+          expect(event.msg).toEqual('ping message')
           calls++
-        });
+        })
     }
-  });
-  vm.$emit('ping','ping message');
+  })
+  vm.$emit('ping', 'ping message')
 
-  nextTick(()=>{
-    vm.$destroy();
-    //Should not emit
-    vm.$emit('pong','pong message');
-    expect(calls).toEqual(1);
+  nextTick(() => {
+    vm.$destroy()
+    // Should not emit
+    vm.$emit('pong', 'pong message')
+    expect(calls).toEqual(1)
     done()
-  });
-});
-
+  })
+})
 
 test('$eventToObservable() with lifecycle hooks', done => {
   const vm = new Vue({
-    created(){
+    created () {
       this.$eventToObservable('hook:beforeDestroy')
         .subscribe(function (event) {
           done(event)
-        });
+        })
     }
-  });
-  nextTick(()=>{
+  })
+  nextTick(() => {
     vm.$destroy()
   })
-});
+})
