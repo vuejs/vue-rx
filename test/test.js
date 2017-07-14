@@ -318,7 +318,6 @@ test('$eventToObservable() with lifecycle hooks', done => {
   })
 })
 
-
 test('$createObservableFunction() with no context', done => {
   const vm = new Vue({
     created () {
@@ -337,7 +336,7 @@ test('$createObservableFunction() with no context', done => {
 test('$createObservableFunction() with muli params & context', done => {
   const vm = new Vue({
     created () {
-      this.$createObservableFunction('add',true)
+      this.$createObservableFunction('add', true)
         .subscribe(function (param) {
           expect(param[0]).toEqual('hola')
           expect(param[1]).toEqual('mundo')
@@ -347,6 +346,6 @@ test('$createObservableFunction() with muli params & context', done => {
     }
   })
   nextTick(() => {
-    vm.add('hola','mundo')
+    vm.add('hola', 'mundo')
   })
 })
