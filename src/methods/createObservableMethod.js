@@ -1,13 +1,13 @@
 import { Rx, hasRx, warn } from '../util'
 
 /**
- * @name Vue.prototype.$createObservableFunction
+ * @name Vue.prototype.$createObservableMethod
  * @description Creates an observable from a given function name.
- * @param {String} functionName Function name
+ * @param {String} methodName Function name
  * @param {Boolean} [passContext] Append the call context at the end of emit data?
  * @return {Observable} Hot stream
  */
-export default function createObservableFunction (functionName, passContext) {
+export default function createObservableMethod (methodName, passContext) {
   if (!hasRx()) {
     return
   }
@@ -16,24 +16,24 @@ export default function createObservableFunction (functionName, passContext) {
   if (!Rx.Observable.prototype.share) {
     warn(
       `No 'share' operator. ` +
-      `$createObservableFunction returns a shared hot observable. ` +
-      `Try import 'rxjs/add/operator/share' for creating ${functionName}`,
+      `$createObservableMethod returns a shared hot observable. ` +
+      `Try import 'rxjs/add/operator/share' for creating ${methodName}`,
       vm
     )
     return
   }
 
-  if (vm[functionName] !== undefined) {
+  if (vm[methodName] !== undefined) {
     warn(
       'Potential bug: ' +
-      `Method ${functionName} already defined on vm and has been overwritten by $createObservableFunction.` +
-      String(vm[functionName]),
+      `Method ${methodName} already defined on vm and has been overwritten by $createObservableMethod.` +
+      String(vm[methodName]),
       vm
     )
   }
 
   const creator = function (observer) {
-    vm[functionName] = function () {
+    vm[methodName] = function () {
       const args = Array.from(arguments)
       if (passContext) {
         args.push(this)
@@ -47,7 +47,7 @@ export default function createObservableFunction (functionName, passContext) {
       }
     }
     return function () {
-      delete vm[functionName]
+      delete vm[methodName]
     }
   }
 

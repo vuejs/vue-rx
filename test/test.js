@@ -318,10 +318,10 @@ test('$eventToObservable() with lifecycle hooks', done => {
   })
 })
 
-test('$createObservableFunction() with no context', done => {
+test('$createObservableMethod() with no context', done => {
   const vm = new Vue({
     created () {
-      this.$createObservableFunction('add')
+      this.$createObservableMethod('add')
         .subscribe(function (param) {
           expect(param).toEqual('hola')
           done(param)
@@ -333,10 +333,10 @@ test('$createObservableFunction() with no context', done => {
   })
 })
 
-test('$createObservableFunction() with muli params & context', done => {
+test('$createObservableMethod() with muli params & context', done => {
   const vm = new Vue({
     created () {
-      this.$createObservableFunction('add', true)
+      this.$createObservableMethod('add', true)
         .subscribe(function (param) {
           expect(param[0]).toEqual('hola')
           expect(param[1]).toEqual('mundo')
@@ -347,5 +347,39 @@ test('$createObservableFunction() with muli params & context', done => {
   })
   nextTick(() => {
     vm.add('hola', 'mundo')
+  })
+})
+
+test('observableMethods mixin', done => {
+  const vm = new Vue({
+    observableMethods: ['add'],
+    created () {
+      this.add$
+        .subscribe(function (param) {
+          expect(param[0]).toEqual('Qué')
+          expect(param[1]).toEqual('tal')
+          done(param)
+        })
+    }
+  })
+  nextTick(() => {
+    vm.add('Qué', 'tal')
+  })
+})
+
+test('observableMethods mixin', done => {
+  const vm = new Vue({
+    observableMethods: { 'add': 'plus$' },
+    created () {
+      this.plus$
+        .subscribe(function (param) {
+          expect(param[0]).toEqual('Qué')
+          expect(param[1]).toEqual('tal')
+          done(param)
+        })
+    }
+  })
+  nextTick(() => {
+    vm.add('Qué', 'tal')
   })
 })

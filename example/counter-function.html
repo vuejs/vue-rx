@@ -7,21 +7,13 @@
 <div id="app">
   <div>{{ count }}</div>
 
-  <!-- simple usage -->
-  <button v-on:click="plus(500)">Add 500</button>
+  <!-- callback declared on observableMethods -->
+  <button v-on:click="muchMore(500)">Add 500</button>
 
-  <button v-stream:click="{ subject: plus$, data: minusDelta1, options:{once:true} }">Add on Click (Option once:true)</button>
-
-  <!-- you can also stream to the same subject with different events/data -->
-  <button
-    v-stream:click="{ subject: minus$, data: minusDelta1 }"
-    v-stream:mousemove="{ subject: minus$, data: minusDelta2 }">
-    Minus on Click &amp; Mousemove
-  </button>
+  <button v-on:click="minus(minusDelta1)"> Minus on Click </button>
 
   <pre>{{ $data }}</pre>
 
-  <my-button v-stream:click="plus$"></my-button>
 </div>
 
 <script>
@@ -35,32 +27,14 @@ new Vue({
     }
   },
 
-  components: {
-    myButton: {
-      template: '<button>MyButton</button>'
-    }
-  },
-
-  created () {
-    //Speed up mousemove minus delta after 5s
-    setTimeout(() => {
-      this.minusDelta2 = -5
-    }, 5000);
-
-  },
-
-  // declare dom stream Subjects
-  domStreams: ['plus$', 'minus$'],
-
-  methods:{
-  },
+  // declare callback Subjects
+  observableMethods: { muchMore:'muchMore$', minus:'minus$'}, // ['muchMore','minus'] as equal
 
   subscriptions () {
     var count$ = Rx.Observable
       .merge(
-      	this.$createObservableFunction('plus'),
-        this.plus$.map(() => 1),
-        this.minus$.pluck('data')
+      	this.muchMore$,
+        this.minus$
       )
       .startWith(0)
       .scan((total, change) => total + change)

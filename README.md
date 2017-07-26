@@ -241,13 +241,13 @@ var vm = new Vue({
 })
 ```
 
-#### `$createObservableFunction(functionName)`
+#### `$createObservableMethod(methodName)`
 
 > This feature requires RxJS.
 
 Convert function calls to observable sequence which emits the call arguments.
 
-This is a prototype method added to instances. Use it to create a shared hot observable from a function name. The function body will assigned to vm.
+This is a prototype method added to instances. Use it to create a shared hot observable from a function name. The function will assigned as a vm method.
 
 ```html
 <custom-form :onSubmit="submitHandler"></custom-form>
@@ -256,9 +256,16 @@ This is a prototype method added to instances. Use it to create a shared hot obs
 var vm = new Vue({
   subscriptions () {
     return {
-      formData: this.$createObservableFunction('submitHandler')
+      // requires `share` operator
+      formData: this.$createObservableMethod('submitHandler')
     }
   }
+})
+```
+Or, use the `observableMethods` convenience option:
+``` js
+new Vue({
+  observableMethods: { submitHandler:'submitHandler$' }
 })
 ```
 [example](https://github.com/vuejs/vue-rx/blob/master/example/counter-function.html)
