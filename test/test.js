@@ -10,6 +10,7 @@ const Observable = require('rxjs/Observable').Observable
 const Subject = require('rxjs/Subject').Subject
 const Subscription = require('rxjs/Subscription').Subscription
 require('rxjs/add/observable/fromEvent')
+require('rxjs/add/operator/share')
 
 // user
 require('rxjs/add/operator/map')
@@ -314,5 +315,71 @@ test('$eventToObservable() with lifecycle hooks', done => {
   })
   nextTick(() => {
     vm.$destroy()
+  })
+})
+
+test('$createObservableMethod() with no context', done => {
+  const vm = new Vue({
+    created () {
+      this.$createObservableMethod('add')
+        .subscribe(function (param) {
+          expect(param).toEqual('hola')
+          done(param)
+        })
+    }
+  })
+  nextTick(() => {
+    vm.add('hola')
+  })
+})
+
+test('$createObservableMethod() with muli params & context', done => {
+  const vm = new Vue({
+    created () {
+      this.$createObservableMethod('add', true)
+        .subscribe(function (param) {
+          expect(param[0]).toEqual('hola')
+          expect(param[1]).toEqual('mundo')
+          expect(param[2]).toEqual(vm)
+          done(param)
+        })
+    }
+  })
+  nextTick(() => {
+    vm.add('hola', 'mundo')
+  })
+})
+
+test('observableMethods mixin', done => {
+  const vm = new Vue({
+    observableMethods: ['add'],
+    created () {
+      this.add$
+        .subscribe(function (param) {
+          expect(param[0]).toEqual('Qué')
+          expect(param[1]).toEqual('tal')
+          done(param)
+        })
+    }
+  })
+  nextTick(() => {
+    vm.add('Qué', 'tal')
+  })
+})
+
+test('observableMethods mixin', done => {
+  const vm = new Vue({
+    observableMethods: { 'add': 'plus$' },
+    created () {
+      this.plus$
+        .subscribe(function (param) {
+          expect(param[0]).toEqual('Qué')
+          expect(param[1]).toEqual('tal')
+          done(param)
+        })
+    }
+  })
+  nextTick(() => {
+    vm.add('Qué', 'tal')
   })
 })

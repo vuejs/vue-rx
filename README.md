@@ -241,6 +241,36 @@ var vm = new Vue({
 })
 ```
 
+#### `$createObservableMethod(methodName)`
+
+> This feature requires RxJS.
+
+Convert function calls to observable sequence which emits the call arguments.
+
+This is a prototype method added to instances. Use it to create a shared hot observable from a function name. The function will assigned as a vm method.
+
+```html
+<custom-form :onSubmit="submitHandler"></custom-form>
+```
+``` js
+var vm = new Vue({
+  subscriptions () {
+    return {
+      // requires `share` operator
+      formData: this.$createObservableMethod('submitHandler')
+    }
+  }
+})
+```
+Or, use the `observableMethods` convenience option:
+``` js
+new Vue({
+  observableMethods: { submitHandler:'submitHandler$' }
+})
+```
+[example](https://github.com/vuejs/vue-rx/blob/master/example/counter-function.html)
+
+
 ### Caveats
 
 You cannot use the `watch` option to watch subscriptions, because it is processed before the subscriptions are set up. But you can use `$watch` in the `created` hook instead.

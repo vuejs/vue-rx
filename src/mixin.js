@@ -14,6 +14,19 @@ export default {
       }
     }
 
+    const observableMethods = vm.$options.observableMethods
+    if (observableMethods) {
+      if (Array.isArray(observableMethods)) {
+        observableMethods.forEach(methodName => {
+          vm[ methodName + '$' ] = vm.$createObservableMethod(methodName)
+        })
+      } else {
+        Object.keys(observableMethods).forEach(methodName => {
+          vm[observableMethods[methodName]] = vm.$createObservableMethod(methodName)
+        })
+      }
+    }
+
     let obs = vm.$options.subscriptions
     if (typeof obs === 'function') {
       obs = obs.call(vm)

@@ -1,0 +1,47 @@
+<!-- this demo requires a browser that natively supports ES2015 -->
+
+<script src="https://unpkg.com/@reactivex/rxjs/dist/global/Rx.js"></script>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="../dist/vue-rx.js"></script>
+
+<div id="app">
+  <div>{{ count }}</div>
+
+  <!-- callback declared on observableMethods -->
+  <button v-on:click="muchMore(500)">Add 500</button>
+
+  <button v-on:click="minus(minusDelta1)"> Minus on Click </button>
+
+  <pre>{{ $data }}</pre>
+
+</div>
+
+<script>
+new Vue({
+  el: '#app',
+
+  data () {
+    return {
+      minusDelta1: -1,
+      minusDelta2: -1
+    }
+  },
+
+  // declare callback Subjects
+  observableMethods: { muchMore:'muchMore$', minus:'minus$'}, // ['muchMore','minus'] as equal
+
+  subscriptions () {
+    var count$ = Rx.Observable
+      .merge(
+      	this.muchMore$,
+        this.minus$
+      )
+      .startWith(0)
+      .scan((total, change) => total + change)
+
+    return {
+      count: count$
+    }
+  }
+})
+</script>
