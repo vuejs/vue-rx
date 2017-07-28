@@ -195,14 +195,14 @@ Convert vue.$on (including lifecycle events) to Observables. The emitted value i
 var vm = new Vue({
   created () {
     this.$eventToObservable('customEvent')
-	  .subscribe((event) => console.log(event.name,event.msg))	
+	  .subscribe((event) => console.log(event.name,event.msg))
   }
 })
 
 // vm.$once vue-rx version
 this.$eventToObservable('customEvent')
   .take(1)
-  
+
 // Another way to auto unsub:
 let beforeDestroy$ = this.$eventToObservable('hook:beforeDestroy').take(1)
 Rx.Observable.interval(500)
@@ -247,7 +247,7 @@ var vm = new Vue({
 
 Convert function calls to observable sequence which emits the call arguments.
 
-This is a prototype method added to instances. Use it to create a shared hot observable from a function name. The function will assigned as a vm method.
+This is a prototype method added to instances. Use it to create a shared hot observable from a function name. The function will be assigned as a vm method.
 
 ```html
 <custom-form :onSubmit="submitHandler"></custom-form>
@@ -262,14 +262,24 @@ var vm = new Vue({
   }
 })
 ```
-Or, use the `observableMethods` convenience option:
+
+You can use the `observableMethods` option to make it more declarative:
+
 ``` js
 new Vue({
-  observableMethods: { submitHandler:'submitHandler$' }
+  observableMethods: {
+    submitHandler:'submitHandler$'
+    // or with Array shothand: ['submitHandler']
+  }
 })
 ```
-[example](https://github.com/vuejs/vue-rx/blob/master/example/counter-function.html)
 
+The above will automatically create two things on the instance:
+
+1. A `submitHandler` method which can be bound to in template with `v-on`;
+2. A `submitHandler$` observable which will be the stream emitting calls to `submitHandler`.
+
+[example](https://github.com/vuejs/vue-rx/blob/master/example/counter-function.html)
 
 ### Caveats
 

@@ -28,7 +28,10 @@ new Vue({
   },
 
   // declare callback Subjects
-  observableMethods: { muchMore:'muchMore$', minus:'minus$'}, // ['muchMore','minus'] as equal
+  observableMethods: {
+    muchMore: 'muchMore$',
+    minus:'minus$'
+  }, // equivalent of above: ['muchMore','minus']
 
   subscriptions () {
     var count$ = Rx.Observable
