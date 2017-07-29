@@ -119,7 +119,7 @@ new Vue({
 
 ``` js
 new Vue({
-  // 需要将 `Rx` 传递给 Vue.ues() 以暴露 `Subject`
+  // 需要将 `Rx` 传递给 Vue.use() 以暴露 `Subject`
   domStreams: ['plus$'],
   subscriptions () {
     // 使用 this.plus$
