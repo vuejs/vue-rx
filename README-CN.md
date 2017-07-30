@@ -195,7 +195,7 @@ vm.$watchAsObservable('a')
 var vm = new Vue({
   created () {
     this.$eventToObservable('customEvent')
-	  .subscribe((event) => console.log(event.name,event.msg))	
+	  .subscribe((event) => console.log(event.name,event.msg))
   }
 })
 
@@ -209,6 +209,8 @@ Rx.Observable.interval(500)
 ```
 
 #### `$subscribeTo(observable, next, error, complete)`
+
+这是一个添加到实例上的原型方法。可以用它来订阅 obserable，但是让 VueRx 来管理清理 (dispose) 和取消订阅 (unsubscribe)。
 
 ``` js
 var vm = new Vue({
@@ -224,6 +226,10 @@ var vm = new Vue({
 
 > 此功能需要 RxJS 。
 
+这是一个添加到实例上的原型方法。使用它从实例的元素的 DOM 事件创建 observable 。这类似于 `Rx.Observable.fromEvent`，但即使在 DOM 实际渲染 之前，`subscriptions` 函数中也是可用的。
+
+`selector` 用于寻找组件根元素的子孙节点，如果你想要监听根元素本身，那么传递 `null` 作为第一个参数
+
 ``` js
 var vm = new Vue({
   subscriptions () {
@@ -233,6 +239,45 @@ var vm = new Vue({
   }
 })
 ```
+
+#### `$createObservableMethod(methodName)`
+
+> 此功能需要 RxJS 。
+
+将函数调用转换为发出调用参数的 observable 序列。
+
+这是一个添加到实例上的原型方法。用它来根据函数名称创建一个共享的热的 observable 。该函数会被赋值为一个 vm 方法。
+
+```html
+<custom-form :onSubmit="submitHandler"></custom-form>
+```
+``` js
+var vm = new Vue({
+  subscriptions () {
+    return {
+      // 需要 `share` 操作符
+      formData: this.$createObservableMethod('submitHandler')
+    }
+  }
+})
+```
+你可以使用 `observableMethods` 选项使其更为声明式:
+
+``` js
+new Vue({
+  observableMethods: {
+    submitHandler:'submitHandler$'
+    // 或者使用数组简写形式: ['submitHandler']
+  }
+})
+```
+
+上面的代码会自动地在实例上创建两样东西:
+
+1. `submitHandler` 方法，它可以使用 `v-on` 在模板中进行绑定。
+2. `submitHandler$` observalbe， 它是向 `submitHandler` 发出调用的流。
+
+[示例](https://github.com/vuejs/vue-rx/blob/master/example/counter-function.html)
 
 ### 警告
 
