@@ -17,6 +17,7 @@ require('rxjs/add/operator/map')
 require('rxjs/add/operator/startWith')
 require('rxjs/add/operator/scan')
 require('rxjs/add/operator/pluck')
+require('rxjs/add/operator/merge')
 
 const miniRx = {
   Observable,
@@ -127,6 +128,39 @@ test('v-stream directive (basic)', done => {
     subscriptions () {
       return {
         count: this.click$.map(() => 1)
+          .startWith(0)
+          .scan((total, change) => total + change)
+      }
+    }
+  }).$mount()
+
+  expect(vm.$el.querySelector('span').textContent).toBe('0')
+  click(vm.$el.querySelector('button'))
+  nextTick(() => {
+    expect(vm.$el.querySelector('span').textContent).toBe('1')
+    done()
+  })
+})
+
+test('v-stream directive (with .native modify)', done => {
+  const vm = new Vue({
+    template: `
+      <div>
+        <span class="count">{{ count }}</span>
+        <my-button v-stream:click.native="clickNative$">+</my-button>
+        <my-button v-stream:click="click$">-</my-button>
+      </div>
+    `,
+    components: {
+      myButton: {
+        template: '<button>MyButton</button>'
+      }
+    },
+    domStreams: ['clickNative$', 'click$'],
+    subscriptions () {
+      return {
+        count: this.click$.map(() => -1)
+          .merge(this.clickNative$.map(() => 1))
           .startWith(0)
           .scan((total, change) => total + change)
       }
