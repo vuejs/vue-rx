@@ -10,6 +10,7 @@ export default {
     let handle = binding.value
     const event = binding.arg
     const streamName = binding.expression
+    const modifiers = binding.modifiers
 
     if (isSubject(handle)) {
       handle = { subject: handle }
@@ -26,7 +27,7 @@ export default {
     const subject = handle.subject
     const next = (subject.next || subject.onNext).bind(subject)
 
-    if (vnode.componentInstance) {
+    if (!modifiers.native && vnode.componentInstance) {
       handle.subscription = vnode.componentInstance.$eventToObservable(event).subscribe(e => {
         next({
           event: e,
