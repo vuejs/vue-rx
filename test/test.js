@@ -161,10 +161,9 @@ test('v-stream directive (with .native modify)', done => {
     subscriptions () {
       return {
         count: this.clickNative$
+          .merge(this.click$)
           .filter(e => e.event.target && e.event.target.id === 'btn-native')
           .map(() => 1)
-          .merge(this.click$.map(() => -1))
-          .merge()
           .startWith(0)
           .scan((total, change) => total + change)
       }
@@ -172,8 +171,9 @@ test('v-stream directive (with .native modify)', done => {
   }).$mount()
 
   expect(vm.$el.querySelector('span').textContent).toBe('0')
-  click(vm.$el.querySelector('#btn-native'))
   click(vm.$el.querySelector('#btn'))
+  click(vm.$el.querySelector('#btn'))
+  click(vm.$el.querySelector('#btn-native'))
   nextTick(() => {
     expect(vm.$el.querySelector('span').textContent).toBe('1')
     done()
