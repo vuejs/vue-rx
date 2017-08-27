@@ -18,6 +18,7 @@ require('rxjs/add/operator/startWith')
 require('rxjs/add/operator/scan')
 require('rxjs/add/operator/pluck')
 require('rxjs/add/operator/merge')
+require('rxjs/add/operator/filter')
 
 const miniRx = {
   Observable,
@@ -147,8 +148,8 @@ test('v-stream directive (with .native modify)', done => {
     template: `
       <div>
         <span class="count">{{ count }}</span>
-        <my-button v-stream:click.native="clickNative$">+</my-button>
-        <my-button v-stream:click="click$">-</my-button>
+        <my-button id="btn-native" v-stream:click.native="clickNative$">+</my-button>
+        <my-button id="btn" v-stream:click="click$">-</my-button>
       </div>
     `,
     components: {
@@ -159,8 +160,11 @@ test('v-stream directive (with .native modify)', done => {
     domStreams: ['clickNative$', 'click$'],
     subscriptions () {
       return {
-        count: this.click$.map(() => -1)
-          .merge(this.clickNative$.map(() => 1))
+        count: this.clickNative$
+          .filter(e => e.event.target && e.event.target.id === 'btn-native')
+          .map(() => 1)
+          .merge(this.click$.map(() => -1))
+          .merge()
           .startWith(0)
           .scan((total, change) => total + change)
       }
@@ -168,7 +172,8 @@ test('v-stream directive (with .native modify)', done => {
   }).$mount()
 
   expect(vm.$el.querySelector('span').textContent).toBe('0')
-  click(vm.$el.querySelector('button'))
+  click(vm.$el.querySelector('#btn-native'))
+  click(vm.$el.querySelector('#btn'))
   nextTick(() => {
     expect(vm.$el.querySelector('span').textContent).toBe('1')
     done()
