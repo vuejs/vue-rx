@@ -46,7 +46,7 @@ export default {
         }
         vm._obSubscriptions.push(obs[key].subscribe(value => {
           vm[key] = value
-        }))
+        }, (error) => { throw error }))
       })
     }
   },
