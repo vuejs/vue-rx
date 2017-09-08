@@ -117,6 +117,29 @@ test('subscriptions() has access to component state', () => {
   expect(vm.$el.textContent).toBe('FOOBAR')
 })
 
+test('subscriptions() can throw error properly', done => {
+  const { ob, next } = mock()
+
+  const vm = new Vue({
+    subscriptions () {
+      return {
+        num: ob.startWith(1).map(n => n.toFixed())
+      }
+    },
+    render (h) {
+      return h('div', this.num)
+    }
+  }).$mount()
+
+  nextTick(() => {
+    expect(() => {
+      next(null)
+    }).toThrow()
+    expect(vm.$el.textContent).toBe('1')
+    done()
+  })
+})
+
 test('v-stream directive (basic)', done => {
   const vm = new Vue({
     template: `
