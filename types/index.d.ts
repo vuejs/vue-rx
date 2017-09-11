@@ -5,8 +5,8 @@ import { Observable } from 'rxjs/Observable'
 export type Observables = Record<string, Observable<any>>
 declare module 'vue/types/options' {
   interface ComponentOptions<V extends Vue> {
-    subscriptions:  Observables | (() => Observables)
-    domStreams: string[]
+    subscriptions?: Observables | ((this: V) => Observables)
+    domStreams?: string[]
   }
 }
 
