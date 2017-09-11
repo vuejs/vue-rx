@@ -7,7 +7,7 @@
       "dom",
       "es2015.promise"
     ],
-    "stict": true,
+    "strict": true,
     "noEmit": true
   },
   "include": [
