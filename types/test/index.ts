@@ -56,9 +56,26 @@ var vm = new Vue({
 })
 
 var vm = new Vue({
+  mounted () {
+    this.$subscribeTo(Rx.Observable.interval(1000), function (count) {
+      console.log(count)
+    })
+  }
+})
+
+var vm = new Vue({
   subscriptions () {
     return {
       inputValue: this.$fromDOMEvent('input', 'keyup').pluck('target', 'value')
+    }
+  }
+})
+
+var vm = new Vue({
+  subscriptions () {
+    return {
+      // requires `share` operator
+      formData: this.$createObservableMethod('submitHandler')
     }
   }
 })
