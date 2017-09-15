@@ -33,7 +33,7 @@
     "dev:test": "jest --watch",
     "prebuild": "npm run lint",
     "pretest": "npm run build",
-    "prepublish": "npm run build"
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
     "buble": "^0.15.2",
