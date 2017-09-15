@@ -4,8 +4,10 @@
   "description": "RxJS bindings for Vue",
   "main": "dist/vue-rx.js",
   "files": [
-    "dist"
+    "dist",
+    "types/*.d.ts"
   ],
+  "typings": "types/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vuejs/vue-rx.git"
