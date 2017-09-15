@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "lib": [
+      "es5",
+      "dom",
+      "es2015.promise",
+      "es2015.core"
+    ],
+    "strict": true,
+    "allowSyntheticDefaultImports": true,
+    "noEmit": true
+  }
+}

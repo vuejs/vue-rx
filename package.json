@@ -1,6 +1,6 @@
 {
   "name": "vue-rx",
-  "version": "3.4.0",
+  "version": "4.0.0",
   "description": "RxJS bindings for Vue",
   "main": "dist/vue-rx.js",
   "files": [
@@ -25,7 +25,9 @@
     "dev": "rollup -c rollup.config.js -w",
     "build": "rollup -c rollup.config.js",
     "lint": "eslint src test example --fix",
-    "test": "jest",
+    "test": "npm run test:unit && npm run test:types",
+    "test:unit": "jest",
+    "test:types": "tsc -p types/test",
     "dev:test": "jest --watch",
     "prebuild": "npm run lint",
     "pretest": "npm run build",
@@ -41,6 +43,7 @@
     "rollup-plugin-buble": "^0.15.0",
     "rollup-watch": "^3.2.2",
     "rxjs": "^5.2.0",
+    "typescript": "^2.5.2",
     "vue": "^2.2.4"
   },
   "eslintConfig": {
