@@ -9,6 +9,7 @@
       "es2015.core"
     ],
     "strict": true,
+    "allowSyntheticDefaultImports": true,
     "noEmit": true
   }
 }

@@ -8,6 +8,7 @@
       "es2015.promise"
     ],
     "strict": true,
+    "allowSyntheticDefaultImports": true,
     "noEmit": true
   },
   "include": [

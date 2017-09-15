@@ -1,4 +1,4 @@
-import Vue = require('vue')
+import Vue from 'vue'
 import { WatchOptions } from 'vue'
 import { Observable } from 'rxjs/Observable'
 
