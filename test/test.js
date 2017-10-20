@@ -370,8 +370,8 @@ test('$eventToObservable() with lifecycle hooks', done => {
   const vm = new Vue({
     created () {
       this.$eventToObservable('hook:beforeDestroy')
-        .subscribe(function (event) {
-          done(event)
+        .subscribe(() => {
+          done()
         })
     }
   })
@@ -386,7 +386,7 @@ test('$createObservableMethod() with no context', done => {
       this.$createObservableMethod('add')
         .subscribe(function (param) {
           expect(param).toEqual('hola')
-          done(param)
+          done()
         })
     }
   })
@@ -403,7 +403,7 @@ test('$createObservableMethod() with muli params & context', done => {
           expect(param[0]).toEqual('hola')
           expect(param[1]).toEqual('mundo')
           expect(param[2]).toEqual(vm)
-          done(param)
+          done()
         })
     }
   })
@@ -420,7 +420,7 @@ test('observableMethods mixin', done => {
         .subscribe(function (param) {
           expect(param[0]).toEqual('Qué')
           expect(param[1]).toEqual('tal')
-          done(param)
+          done()
         })
     }
   })
@@ -437,7 +437,7 @@ test('observableMethods mixin', done => {
         .subscribe(function (param) {
           expect(param[0]).toEqual('Qué')
           expect(param[1]).toEqual('tal')
-          done(param)
+          done()
         })
     }
   })
