@@ -4,14 +4,14 @@ import * as Rx from 'rxjs/Rx'
 
 Vue.use(VueRX, Rx)
 
-var vm = new Vue({
+const vm1 = new Vue({
   el: '#app',
   subscriptions: {
     msg: Rx.Observable.interval(100)
   }
 })
 
-vm.$observables.msg.subscribe(msg => console.log(msg))
+vm1.$observables.msg.subscribe(msg => console.log(msg))
 
 Vue.component('foo', {
   subscriptions: function () {
@@ -25,7 +25,7 @@ new Vue({
   domStreams: ['plus$']
 })
 
-var vm = new Vue({
+const vm2 = new Vue({
   data: {
     a: 1
   },
@@ -40,7 +40,7 @@ var vm = new Vue({
 })
 
 // or produce side effects...
-vm.$watchAsObservable('a')
+vm2.$watchAsObservable('a')
   .subscribe(
     ({ newValue, oldValue }) => console.log('stream value', newValue, oldValue),
     err => console.error(err),
@@ -48,14 +48,14 @@ vm.$watchAsObservable('a')
   )
 
 
-var vm = new Vue({
+new Vue({
   created () {
     this.$eventToObservable('customEvent')
     .subscribe((event) => console.log(event.name,event.msg))
   }
 })
 
-var vm = new Vue({
+new Vue({
   mounted () {
     this.$subscribeTo(Rx.Observable.interval(1000), function (count) {
       console.log(count)
@@ -63,7 +63,7 @@ var vm = new Vue({
   }
 })
 
-var vm = new Vue({
+new Vue({
   subscriptions () {
     return {
       inputValue: this.$fromDOMEvent('input', 'keyup').pluck('target', 'value')
@@ -71,7 +71,7 @@ var vm = new Vue({
   }
 })
 
-var vm = new Vue({
+new Vue({
   subscriptions () {
     return {
       // requires `share` operator
@@ -80,7 +80,7 @@ var vm = new Vue({
   }
 })
 
-var vm = new Vue({
+new Vue({
   subscriptions () {
     return {
       // requires `share` operator
