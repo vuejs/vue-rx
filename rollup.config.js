@@ -1,9 +1,11 @@
 const buble = require('rollup-plugin-buble')
 
 module.exports = {
-  entry: 'src/index.js',
-  dest: 'dist/vue-rx.js',
-  format: 'umd',
-  moduleName: 'VueRx',
+  input: 'src/index.js',
+  output: {
+    file: 'dist/vue-rx.js',
+    format: 'umd',
+    name: 'VueRx',
+  },
   plugins: [buble()]
 }
