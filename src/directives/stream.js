@@ -24,11 +24,21 @@ export default {
       return
     }
 
+    const modifiersFuncs = {
+        stop: e => e.stopPropagation(),
+        prevent: e => e.preventDefault()
+    };
+
+    var modifiersExists = Object.keys(modifiersFuncs).filter(
+        key => modifiers[key]
+    );
+    
     const subject = handle.subject
     const next = (subject.next || subject.onNext).bind(subject)
 
     if (!modifiers.native && vnode.componentInstance) {
       handle.subscription = vnode.componentInstance.$eventToObservable(event).subscribe(e => {
+        modifiersFuncs.map(mod => modifiersFuncs[mod](e));
         next({
           event: e,
           data: handle.data
@@ -46,6 +56,7 @@ export default {
       }
       const fromEventArgs = handle.options ? [el, event, handle.options] : [el, event]
       handle.subscription = Rx.Observable.fromEvent(...fromEventArgs).subscribe(e => {
+        modifiersFuncs.map(mod => modifiersFuncs[mod](e));
         next({
           event: e,
           data: handle.data
