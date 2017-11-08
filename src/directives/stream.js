@@ -38,7 +38,7 @@ export default {
 
     if (!modifiers.native && vnode.componentInstance) {
       handle.subscription = vnode.componentInstance.$eventToObservable(event).subscribe(e => {
-        modifiersFuncs.map(mod => modifiersFuncs[mod](e));
+        modifiersExists.map(mod => modifiersFuncs[mod](e));
         next({
           event: e,
           data: handle.data
@@ -56,7 +56,7 @@ export default {
       }
       const fromEventArgs = handle.options ? [el, event, handle.options] : [el, event]
       handle.subscription = Rx.Observable.fromEvent(...fromEventArgs).subscribe(e => {
-        modifiersFuncs.map(mod => modifiersFuncs[mod](e));
+        modifiersExists.map(mod => modifiersFuncs[mod](e));
         next({
           event: e,
           data: handle.data
