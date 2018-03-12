@@ -203,6 +203,32 @@ test('v-stream directive (with .native modify)', done => {
   })
 })
 
+test('v-stream directive (with .stop, .prevent modify)', done => {
+  const vm = new Vue({
+    template: `
+      <form>
+        <span>{{stoped}} {{prevented}}</span>
+        <button id="btn-stop" v-stream:click.stop="clickStop$">Stop</button>
+        <button id="btn-prevent" type="submit" v-stream:click.prevent="clickPrevent$">Submit</button>
+      </form>
+    `,
+    domStreams: ['clickStop$', 'clickPrevent$'],
+    subscriptions () {
+      return {
+        stoped: this.clickStop$.map(x => x.event.cancelBubble),
+        prevented: this.clickPrevent$.map(x => x.event.defaultPrevented)
+      }
+    }
+  }).$mount()
+
+  click(vm.$el.querySelector('#btn-stop'))
+  click(vm.$el.querySelector('#btn-prevent'))
+  nextTick(() => {
+    expect(vm.$el.querySelector('span').textContent).toBe('true true')
+    done()
+  })
+})
+
 test('v-stream directive (with data)', done => {
   const vm = new Vue({
     data: {
