@@ -151,6 +151,20 @@ Starting in 3.1 you can also pass along extra options (passed along to native `a
 
 See [example](https://github.com/vuejs/vue-rx/blob/master/example/counter.html) for actual usage.
 
+### `v-stream`: Streaming Custom Events from Child Components
+
+Starting in 3.2, similar to streaming `DOM` events, `v-stream` can be used on components as well and will create observables from custom events emitted by the child component. It works similar to `v-on`:
+
+```html
+<div>
+  <!-- Custom component -->
+  <pagination v-on:change="pageChanged()"></pagination>
+
+  <!-- v-stream with custiom component -->
+  <pagination v-stream:change="pageChange$"></pagination>
+</div>
+```
+
 ### Other API Methods
 
 #### `$watchAsObservable(expOrFn, [options])`
