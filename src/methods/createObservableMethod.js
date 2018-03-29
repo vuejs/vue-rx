@@ -7,17 +7,13 @@ import { Rx, hasRx, warn } from '../util'
  * @param {Boolean} [passContext] Append the call context at the end of emit data?
  * @return {Observable} Hot stream
  */
-export default function createObservableMethod (
-  methodName,
-  passContext
-) {
+export default function createObservableMethod (methodName, passContext) {
   if (!hasRx()) {
     return
   }
   const vm = this
 
-  const share =
-    Rx.share || Rx.Observable.prototype.share
+  const share = Rx.share || Rx.Observable.prototype.share
   if (!share) {
     warn(
       `No 'share' operator. ` +
@@ -59,9 +55,7 @@ export default function createObservableMethod (
   // Must be a hot stream otherwise function context may overwrite over and over again
 
   if (Rx.share) {
-    return Rx.Observable.create(creator).pipe(
-      share()
-    )
+    return Rx.Observable.create(creator).pipe(share())
   }
   return Rx.Observable.create(creator).share()
 }
