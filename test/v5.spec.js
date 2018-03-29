@@ -1,27 +1,24 @@
 /* eslint-env jest */
 
-'use strict'
+"use strict"
 
-const Vue = require('vue/dist/vue.js')
-const VueRx = require('../dist/vue-rx.js')
+const Vue = require("vue/dist/vue.js")
+const VueRx = require("../dist/vue-rx.js")
 
 // library
-const Observable = require('rxjs-compat/Observable')
-  .Observable
-const Subject = require('rxjs-compat/Subject')
-  .Subject
-const Subscription = require('rxjs-compat/Subscription')
-  .Subscription
-require('rxjs-compat/add/observable/fromEvent')
-require('rxjs-compat/add/operator/share')
+const Observable = require("rxjs-compat/Observable").Observable
+const Subject = require("rxjs-compat/Subject").Subject
+const Subscription = require("rxjs-compat/Subscription").Subscription
+require("rxjs-compat/add/observable/fromEvent")
+require("rxjs-compat/add/operator/share")
 
 // user
-require('rxjs-compat/add/operator/map')
-require('rxjs-compat/add/operator/startWith')
-require('rxjs-compat/add/operator/scan')
-require('rxjs-compat/add/operator/pluck')
-require('rxjs-compat/add/operator/merge')
-require('rxjs-compat/add/operator/filter')
+require("rxjs-compat/add/operator/map")
+require("rxjs-compat/add/operator/startWith")
+require("rxjs-compat/add/operator/scan")
+require("rxjs-compat/add/operator/pluck")
+require("rxjs-compat/add/operator/merge")
+require("rxjs-compat/add/operator/filter")
 
 const miniRx = {
   Observable,
@@ -34,30 +31,28 @@ Vue.use(VueRx, miniRx)
 
 const nextTick = Vue.nextTick
 
-function mock () {
+function mock() {
   let observer
-  const observable = Observable.create(
-    _observer => {
-      observer = _observer
-    }
-  )
+  const observable = Observable.create(_observer => {
+    observer = _observer
+  })
   return {
     ob: observable,
     next: val => observer.next(val)
   }
 }
 
-function trigger (target, event) {
-  var e = document.createEvent('HTMLEvents')
+function trigger(target, event) {
+  var e = document.createEvent("HTMLEvents")
   e.initEvent(event, true, true)
   target.dispatchEvent(e)
 }
 
-function click (target) {
-  trigger(target, 'click')
+function click(target) {
+  trigger(target, "click")
 }
 
-test('expose $observables', () => {
+test("expose $observables", () => {
   const { ob, next } = mock()
 
   const vm = new Vue({
@@ -77,49 +72,49 @@ test('expose $observables', () => {
   expect(results).toEqual([0, 1, 2, 3])
 })
 
-test('bind subscriptions to render', done => {
+test("bind subscriptions to render", done => {
   const { ob, next } = mock()
 
   const vm = new Vue({
     subscriptions: {
-      hello: ob.startWith('foo')
+      hello: ob.startWith("foo")
     },
-    render (h) {
-      return h('div', this.hello)
+    render(h) {
+      return h("div", this.hello)
     }
   }).$mount()
 
-  expect(vm.$el.textContent).toBe('foo')
+  expect(vm.$el.textContent).toBe("foo")
 
-  next('bar')
+  next("bar")
   nextTick(() => {
-    expect(vm.$el.textContent).toBe('bar')
+    expect(vm.$el.textContent).toBe("bar")
     done()
   })
 })
 
-test('subscriptions() has access to component state', () => {
+test("subscriptions() has access to component state", () => {
   const { ob } = mock()
 
   const vm = new Vue({
     data: {
-      foo: 'FOO'
+      foo: "FOO"
     },
-    props: ['bar'],
+    props: ["bar"],
     propsData: {
-      bar: 'BAR'
+      bar: "BAR"
     },
-    subscriptions () {
+    subscriptions() {
       return {
         hello: ob.startWith(this.foo + this.bar)
       }
     },
-    render (h) {
-      return h('div', this.hello)
+    render(h) {
+      return h("div", this.hello)
     }
   }).$mount()
 
-  expect(vm.$el.textContent).toBe('FOOBAR')
+  expect(vm.$el.textContent).toBe("FOOBAR")
 })
 
 /* I believe this is a breaking change of v6 :/
@@ -147,7 +142,7 @@ test("subscriptions() can throw error properly", done => {
 })
 */
 
-test('v-stream directive (basic)', done => {
+test("v-stream directive (basic)", done => {
   const vm = new Vue({
     template: `
       <div>
@@ -155,8 +150,8 @@ test('v-stream directive (basic)', done => {
         <button v-stream:click="click$">+</button>
       </div>
     `,
-    domStreams: ['click$'],
-    subscriptions () {
+    domStreams: ["click$"],
+    subscriptions() {
       return {
         count: this.click$
           .map(() => 1)
@@ -166,19 +161,15 @@ test('v-stream directive (basic)', done => {
     }
   }).$mount()
 
-  expect(
-    vm.$el.querySelector('span').textContent
-  ).toBe('0')
-  click(vm.$el.querySelector('button'))
+  expect(vm.$el.querySelector("span").textContent).toBe("0")
+  click(vm.$el.querySelector("button"))
   nextTick(() => {
-    expect(
-      vm.$el.querySelector('span').textContent
-    ).toBe('1')
+    expect(vm.$el.querySelector("span").textContent).toBe("1")
     done()
   })
 })
 
-test('v-stream directive (with .native modify)', done => {
+test("v-stream directive (with .native modify)", done => {
   const vm = new Vue({
     template: `
       <div>
@@ -189,19 +180,15 @@ test('v-stream directive (with .native modify)', done => {
     `,
     components: {
       myButton: {
-        template: '<button>MyButton</button>'
+        template: "<button>MyButton</button>"
       }
     },
-    domStreams: ['clickNative$', 'click$'],
-    subscriptions () {
+    domStreams: ["clickNative$", "click$"],
+    subscriptions() {
       return {
         count: this.clickNative$
           .merge(this.click$)
-          .filter(
-            e =>
-              e.event.target &&
-              e.event.target.id === 'btn-native'
-          )
+          .filter(e => e.event.target && e.event.target.id === "btn-native")
           .map(() => 1)
           .startWith(0)
           .scan((total, change) => total + change)
@@ -209,21 +196,17 @@ test('v-stream directive (with .native modify)', done => {
     }
   }).$mount()
 
-  expect(
-    vm.$el.querySelector('span').textContent
-  ).toBe('0')
-  click(vm.$el.querySelector('#btn'))
-  click(vm.$el.querySelector('#btn'))
-  click(vm.$el.querySelector('#btn-native'))
+  expect(vm.$el.querySelector("span").textContent).toBe("0")
+  click(vm.$el.querySelector("#btn"))
+  click(vm.$el.querySelector("#btn"))
+  click(vm.$el.querySelector("#btn-native"))
   nextTick(() => {
-    expect(
-      vm.$el.querySelector('span').textContent
-    ).toBe('1')
+    expect(vm.$el.querySelector("span").textContent).toBe("1")
     done()
   })
 })
 
-test('v-stream directive (with .stop, .prevent modify)', done => {
+test("v-stream directive (with .stop, .prevent modify)", done => {
   const vm = new Vue({
     template: `
       <form>
@@ -232,30 +215,24 @@ test('v-stream directive (with .stop, .prevent modify)', done => {
         <button id="btn-prevent" type="submit" v-stream:click.prevent="clickPrevent$">Submit</button>
       </form>
     `,
-    domStreams: ['clickStop$', 'clickPrevent$'],
-    subscriptions () {
+    domStreams: ["clickStop$", "clickPrevent$"],
+    subscriptions() {
       return {
-        stoped: this.clickStop$.map(
-          x => x.event.cancelBubble
-        ),
-        prevented: this.clickPrevent$.map(
-          x => x.event.defaultPrevented
-        )
+        stoped: this.clickStop$.map(x => x.event.cancelBubble),
+        prevented: this.clickPrevent$.map(x => x.event.defaultPrevented)
       }
     }
   }).$mount()
 
-  click(vm.$el.querySelector('#btn-stop'))
-  click(vm.$el.querySelector('#btn-prevent'))
+  click(vm.$el.querySelector("#btn-stop"))
+  click(vm.$el.querySelector("#btn-prevent"))
   nextTick(() => {
-    expect(
-      vm.$el.querySelector('span').textContent
-    ).toBe('true true')
+    expect(vm.$el.querySelector("span").textContent).toBe("true true")
     done()
   })
 })
 
-test('v-stream directive (with data)', done => {
+test("v-stream directive (with data)", done => {
   const vm = new Vue({
     data: {
       delta: -1
@@ -266,39 +243,33 @@ test('v-stream directive (with data)', done => {
         <button v-stream:click="{ subject: click$, data: delta }">+</button>
       </div>
     `,
-    domStreams: ['click$'],
-    subscriptions () {
+    domStreams: ["click$"],
+    subscriptions() {
       return {
         count: this.click$
-          .pluck('data')
+          .pluck("data")
           .startWith(0)
           .scan((total, change) => total + change)
       }
     }
   }).$mount()
 
-  expect(
-    vm.$el.querySelector('span').textContent
-  ).toBe('0')
-  click(vm.$el.querySelector('button'))
+  expect(vm.$el.querySelector("span").textContent).toBe("0")
+  click(vm.$el.querySelector("button"))
   nextTick(() => {
-    expect(
-      vm.$el.querySelector('span').textContent
-    ).toBe('-1')
+    expect(vm.$el.querySelector("span").textContent).toBe("-1")
     vm.delta = 1
     nextTick(() => {
-      click(vm.$el.querySelector('button'))
+      click(vm.$el.querySelector("button"))
       nextTick(() => {
-        expect(
-          vm.$el.querySelector('span').textContent
-        ).toBe('0')
+        expect(vm.$el.querySelector("span").textContent).toBe("0")
         done()
       })
     })
   })
 })
 
-test('v-stream directive (multiple bindings on same node)', done => {
+test("v-stream directive (multiple bindings on same node)", done => {
   const vm = new Vue({
     template: `
       <div>
@@ -308,39 +279,30 @@ test('v-stream directive (multiple bindings on same node)', done => {
           v-stream:keyup="{ subject: plus$, data: -1 }">+</button>
       </div>
     `,
-    domStreams: ['plus$'],
-    subscriptions () {
+    domStreams: ["plus$"],
+    subscriptions() {
       return {
         count: this.plus$
-          .pluck('data')
+          .pluck("data")
           .startWith(0)
           .scan((total, change) => total + change)
       }
     }
   }).$mount()
 
-  expect(
-    vm.$el.querySelector('span').textContent
-  ).toBe('0')
-  click(vm.$el.querySelector('button'))
+  expect(vm.$el.querySelector("span").textContent).toBe("0")
+  click(vm.$el.querySelector("button"))
   nextTick(() => {
-    expect(
-      vm.$el.querySelector('span').textContent
-    ).toBe('1')
-    trigger(
-      vm.$el.querySelector('button'),
-      'keyup'
-    )
+    expect(vm.$el.querySelector("span").textContent).toBe("1")
+    trigger(vm.$el.querySelector("button"), "keyup")
     nextTick(() => {
-      expect(
-        vm.$el.querySelector('span').textContent
-      ).toBe('0')
+      expect(vm.$el.querySelector("span").textContent).toBe("0")
       done()
     })
   })
 })
 
-test('$fromDOMEvent()', done => {
+test("$fromDOMEvent()", done => {
   const vm = new Vue({
     template: `
       <div>
@@ -348,11 +310,8 @@ test('$fromDOMEvent()', done => {
         <button>+</button>
       </div>
     `,
-    subscriptions () {
-      const click$ = this.$fromDOMEvent(
-        'button',
-        'click'
-      )
+    subscriptions() {
+      const click$ = this.$fromDOMEvent("button", "click")
       return {
         count: click$
           .map(() => 1)
@@ -363,19 +322,15 @@ test('$fromDOMEvent()', done => {
   }).$mount()
 
   document.body.appendChild(vm.$el)
-  expect(
-    vm.$el.querySelector('span').textContent
-  ).toBe('0')
-  click(vm.$el.querySelector('button'))
+  expect(vm.$el.querySelector("span").textContent).toBe("0")
+  click(vm.$el.querySelector("button"))
   nextTick(() => {
-    expect(
-      vm.$el.querySelector('span').textContent
-    ).toBe('1')
+    expect(vm.$el.querySelector("span").textContent).toBe("1")
     done()
   })
 })
 
-test('$watchAsObservable()', done => {
+test("$watchAsObservable()", done => {
   const vm = new Vue({
     data: {
       count: 0
@@ -383,17 +338,13 @@ test('$watchAsObservable()', done => {
   })
 
   const results = []
-  vm
-    .$watchAsObservable('count')
-    .subscribe(change => {
-      results.push(change)
-    })
+  vm.$watchAsObservable("count").subscribe(change => {
+    results.push(change)
+  })
 
   vm.count++
   nextTick(() => {
-    expect(results).toEqual([
-      { newValue: 1, oldValue: 0 }
-    ])
+    expect(results).toEqual([{ newValue: 1, oldValue: 0 }])
     vm.count++
     nextTick(() => {
       expect(results).toEqual([
@@ -405,11 +356,11 @@ test('$watchAsObservable()', done => {
   })
 })
 
-test('$subscribeTo()', () => {
+test("$subscribeTo()", () => {
   const { ob, next } = mock()
   const results = []
   const vm = new Vue({
-    created () {
+    created() {
       this.$subscribeTo(ob, count => {
         results.push(count)
       })
@@ -424,38 +375,32 @@ test('$subscribeTo()', () => {
   expect(results).toEqual([1]) // should not trigger anymore
 })
 
-test('$eventToObservable()', done => {
+test("$eventToObservable()", done => {
   let calls = 0
   const vm = new Vue({
-    created () {
-      this.$eventToObservable('ping').subscribe(
-        function (event) {
-          expect(event.name).toEqual('ping')
-          expect(event.msg).toEqual(
-            'ping message'
-          )
-          calls++
-        }
-      )
+    created() {
+      this.$eventToObservable("ping").subscribe(function(event) {
+        expect(event.name).toEqual("ping")
+        expect(event.msg).toEqual("ping message")
+        calls++
+      })
     }
   })
-  vm.$emit('ping', 'ping message')
+  vm.$emit("ping", "ping message")
 
   nextTick(() => {
     vm.$destroy()
     // Should not emit
-    vm.$emit('pong', 'pong message')
+    vm.$emit("pong", "pong message")
     expect(calls).toEqual(1)
     done()
   })
 })
 
-test('$eventToObservable() with lifecycle hooks', done => {
+test("$eventToObservable() with lifecycle hooks", done => {
   const vm = new Vue({
-    created () {
-      this.$eventToObservable(
-        'hook:beforeDestroy'
-      ).subscribe(() => {
+    created() {
+      this.$eventToObservable("hook:beforeDestroy").subscribe(() => {
         done()
       })
     }
@@ -465,69 +410,64 @@ test('$eventToObservable() with lifecycle hooks', done => {
   })
 })
 
-test('$createObservableMethod() with no context', done => {
+test("$createObservableMethod() with no context", done => {
   const vm = new Vue({
-    created () {
-      this.$createObservableMethod(
-        'add'
-      ).subscribe(function (param) {
-        expect(param).toEqual('hola')
+    created() {
+      this.$createObservableMethod("add").subscribe(function(param) {
+        expect(param).toEqual("hola")
         done()
       })
     }
   })
   nextTick(() => {
-    vm.add('hola')
+    vm.add("hola")
   })
 })
 
-test('$createObservableMethod() with muli params & context', done => {
+test("$createObservableMethod() with muli params & context", done => {
   const vm = new Vue({
-    created () {
-      this.$createObservableMethod(
-        'add',
-        true
-      ).subscribe(function (param) {
-        expect(param[0]).toEqual('hola')
-        expect(param[1]).toEqual('mundo')
+    created() {
+      this.$createObservableMethod("add", true).subscribe(function(param) {
+        expect(param[0]).toEqual("hola")
+        expect(param[1]).toEqual("mundo")
         expect(param[2]).toEqual(vm)
         done()
       })
     }
   })
   nextTick(() => {
-    vm.add('hola', 'mundo')
+    vm.add("hola", "mundo")
   })
 })
 
-test('observableMethods mixin', done => {
+test("observableMethods mixin", done => {
   const vm = new Vue({
-    observableMethods: ['add'],
-    created () {
-      this.add$.subscribe(function (param) {
-        expect(param[0]).toEqual('Qué')
-        expect(param[1]).toEqual('tal')
+    observableMethods: ["add"],
+    created() {
+      this.add$.subscribe(function(param) {
+        expect(param[0]).toEqual("Qué")
+        expect(param[1]).toEqual("tal")
         done()
       })
     }
   })
   nextTick(() => {
-    vm.add('Qué', 'tal')
+    vm.add("Qué", "tal")
   })
 })
 
-test('observableMethods mixin', done => {
+test("observableMethods mixin", done => {
   const vm = new Vue({
-    observableMethods: { add: 'plus$' },
-    created () {
-      this.plus$.subscribe(function (param) {
-        expect(param[0]).toEqual('Qué')
-        expect(param[1]).toEqual('tal')
+    observableMethods: { add: "plus$" },
+    created() {
+      this.plus$.subscribe(function(param) {
+        expect(param[0]).toEqual("Qué")
+        expect(param[1]).toEqual("tal")
         done()
       })
     }
   })
   nextTick(() => {
-    vm.add('Qué', 'tal')
+    vm.add("Qué", "tal")
   })
 })
