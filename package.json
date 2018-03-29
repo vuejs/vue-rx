@@ -7,26 +7,22 @@
   "typings": "types/index.d.ts",
   "repository": {
     "type": "git",
-    "url":
-      "git+https://github.com/vuejs/vue-rx.git"
+    "url": "git+https://github.com/vuejs/vue-rx.git"
   },
   "keywords": ["vue", "rx", "rxjs"],
   "author": "Evan You",
   "license": "MIT",
   "bugs": {
-    "url":
-      "https://github.com/vuejs/vue-rx/issues"
+    "url": "https://github.com/vuejs/vue-rx/issues"
   },
-  "homepage":
-    "https://github.com/vuejs/vue-rx#readme",
+  "homepage": "https://github.com/vuejs/vue-rx#readme",
   "scripts": {
     "dev": "rollup -c rollup.config.js -w",
     "build": "rollup -c rollup.config.js",
     "lint": "eslint src test example --fix",
-    "test":
-      "npm run test:unit && npm run test:types",
+    "test": "npm run test:unit && npm run test:types",
     "test:unit": "jest",
-    "test:types": "tsc -p types/test",
+    "test:types": "tsc -p types",
     "dev:test": "jest --watch",
     "prebuild": "npm run lint",
     "pretest": "npm run build",
