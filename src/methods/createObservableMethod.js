@@ -17,8 +17,8 @@ export default function createObservableMethod (methodName, passContext) {
   if (!share) {
     warn(
       `No 'share' operator. ` +
-        `$createObservableMethod returns a shared hot observable. ` +
-        `Try import 'rxjs/add/operator/share' for creating ${methodName}`,
+      `$createObservableMethod returns a shared hot observable. ` +
+      `Try import 'rxjs/add/operator/share' for creating ${methodName}`,
       vm
     )
     return
@@ -27,8 +27,8 @@ export default function createObservableMethod (methodName, passContext) {
   if (vm[methodName] !== undefined) {
     warn(
       'Potential bug: ' +
-        `Method ${methodName} already defined on vm and has been overwritten by $createObservableMethod.` +
-        String(vm[methodName]),
+      `Method ${methodName} already defined on vm and has been overwritten by $createObservableMethod.` +
+      String(vm[methodName]),
       vm
     )
   }
@@ -53,7 +53,6 @@ export default function createObservableMethod (methodName, passContext) {
   }
 
   // Must be a hot stream otherwise function context may overwrite over and over again
-
   if (Rx.share) {
     return Rx.Observable.create(creator).pipe(share())
   }
