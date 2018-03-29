@@ -16,12 +16,9 @@ export default {
       handle = { subject: handle }
     } else if (!handle || !isSubject(handle.subject)) {
       warn(
-        'Invalid Subject found in directive with key "' +
-          streamName +
-          '".' +
-          streamName +
-          ' should be an instance of Rx.Subject or have the ' +
-          'type { subject: Rx.Subject, data: any }.',
+        'Invalid Subject found in directive with key "' + streamName + '".' +
+        streamName + ' should be an instance of Rx.Subject or have the ' +
+        'type { subject: Rx.Subject, data: any }.',
         vnode.context
       )
       return
@@ -33,35 +30,32 @@ export default {
     }
 
     var modifiersExists = Object.keys(modifiersFuncs).filter(
-      key => modifiers[key]
+        key => modifiers[key]
     )
 
     const subject = handle.subject
     const next = (subject.next || subject.onNext).bind(subject)
 
     if (!modifiers.native && vnode.componentInstance) {
-      handle.subscription = vnode.componentInstance
-        .$eventToObservable(event)
-        .subscribe(e => {
-          modifiersExists.forEach(mod => modifiersFuncs[mod](e))
-          next({
-            event: e,
-            data: handle.data
-          })
+      handle.subscription = vnode.componentInstance.$eventToObservable(event).subscribe(e => {
+        modifiersExists.forEach(mod => modifiersFuncs[mod](e))
+        next({
+          event: e,
+          data: handle.data
         })
+      })
     } else {
       const fromEvent = Rx.fromEvent || Rx.Observable.fromEvent
       if (!fromEvent) {
         warn(
-          `Please import 'rxjs/operators/fromEvent' and pass to the Vue.use plugin install` +
-            `v-stream directive requires Rx.Observable.fromEvent method. `,
+          `No 'fromEvent' method on Observable class. ` +
+          `v-stream directive requires Rx.Observable.fromEvent method. ` +
+          `Try import 'rxjs/add/observable/fromEvent' for ${streamName}`,
           vnode.context
         )
         return
       }
-      const fromEventArgs = handle.options
-        ? [el, event, handle.options]
-        : [el, event]
+      const fromEventArgs = handle.options ? [el, event, handle.options] : [el, event]
       handle.subscription = fromEvent(...fromEventArgs).subscribe(e => {
         modifiersExists.forEach(mod => modifiersFuncs[mod](e))
         next({
