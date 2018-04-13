@@ -160,7 +160,7 @@ Starting in 3.2, similar to streaming `DOM` events, `v-stream` can be used on co
   <!-- Custom component -->
   <pagination v-on:change="pageChanged()"></pagination>
 
-  <!-- v-stream with custiom component -->
+  <!-- v-stream with custom component -->
   <pagination v-stream:change="pageChange$"></pagination>
 </div>
 ```
