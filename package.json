@@ -1,22 +1,15 @@
 {
   "name": "vue-rx",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "description": "RxJS bindings for Vue",
   "main": "dist/vue-rx.js",
-  "files": [
-    "dist",
-    "types/*.d.ts"
-  ],
+  "files": ["dist", "types/*.d.ts"],
   "typings": "types/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vuejs/vue-rx.git"
   },
-  "keywords": [
-    "vue",
-    "rx",
-    "rxjs"
-  ],
+  "keywords": ["vue", "rx", "rxjs"],
   "author": "Evan You",
   "license": "MIT",
   "bugs": {
@@ -29,7 +22,7 @@
     "lint": "eslint src test example --fix",
     "test": "npm run test:unit && npm run test:types",
     "test:unit": "jest",
-    "test:types": "tsc -p types/test",
+    "test:types": "tsc -p types",
     "dev:test": "jest --watch",
     "prebuild": "npm run lint",
     "pretest": "npm run build",
@@ -43,14 +36,13 @@
     "rollup": "^0.50.0",
     "rollup-plugin-buble": "^0.16.0",
     "rollup-watch": "^4.3.1",
-    "rxjs": "^5.2.0",
+    "rxjs": "^6.0.0",
+    "rxjs-compat": "^6.0.0",
     "typescript": "^2.5.2",
     "vue": "^2.5.0"
   },
   "eslintConfig": {
     "root": true,
-    "extends": [
-      "plugin:vue-libs/recommended"
-    ]
+    "extends": ["plugin:vue-libs/recommended"]
   }
 }

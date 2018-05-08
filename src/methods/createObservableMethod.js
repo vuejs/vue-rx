@@ -13,7 +13,8 @@ export default function createObservableMethod (methodName, passContext) {
   }
   const vm = this
 
-  if (!Rx.Observable.prototype.share) {
+  const share = Rx.share || Rx.Observable.prototype.share
+  if (!share) {
     warn(
       `No 'share' operator. ` +
       `$createObservableMethod returns a shared hot observable. ` +
@@ -52,5 +53,8 @@ export default function createObservableMethod (methodName, passContext) {
   }
 
   // Must be a hot stream otherwise function context may overwrite over and over again
+  if (Rx.share) {
+    return Rx.Observable.create(creator).pipe(share())
+  }
   return Rx.Observable.create(creator).share()
 }

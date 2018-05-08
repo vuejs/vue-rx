@@ -45,7 +45,8 @@ export default {
         })
       })
     } else {
-      if (!Rx.Observable.fromEvent) {
+      const fromEvent = Rx.fromEvent || Rx.Observable.fromEvent
+      if (!fromEvent) {
         warn(
           `No 'fromEvent' method on Observable class. ` +
           `v-stream directive requires Rx.Observable.fromEvent method. ` +
@@ -55,7 +56,7 @@ export default {
         return
       }
       const fromEventArgs = handle.options ? [el, event, handle.options] : [el, event]
-      handle.subscription = Rx.Observable.fromEvent(...fromEventArgs).subscribe(e => {
+      handle.subscription = fromEvent(...fromEventArgs).subscribe(e => {
         modifiersExists.forEach(mod => modifiersFuncs[mod](e))
         next({
           event: e,
