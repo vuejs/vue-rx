@@ -27,7 +27,7 @@ export default {
     }
 
     var modifiersExists = Object.keys(modifiersFuncs).filter(
-        key => modifiers[key]
+      key => modifiers[key]
     )
 
     const subject = handle.subject

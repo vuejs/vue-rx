@@ -6,19 +6,11 @@ const Vue = require('vue/dist/vue.js')
 const VueRx = require('../dist/vue-rx.js')
 
 // library
-const { Observable, Subject, Subscription, fromEvent } = require('rxjs')
+const { Observable } = require('rxjs')
 const { map, scan, pluck, merge, tap, filter, startWith } = require('rxjs/operators')
 
-Observable.fromEvent = fromEvent
-
-const miniRx = {
-  Observable,
-  Subscription,
-  Subject
-}
-
 Vue.config.productionTip = false
-Vue.use(VueRx, miniRx)
+Vue.use(VueRx)
 
 const nextTick = Vue.nextTick
 
