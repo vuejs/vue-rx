@@ -1,16 +1,15 @@
-import { Rx, hasRx, getDisposable } from '../util'
+import { Observable, Subscription, NEVER } from 'rxjs'
 
 export default function fromDOMEvent (selector, event) {
-  if (!hasRx()) {
-    return
-  }
   if (typeof window === 'undefined') {
-    return Rx.Observable.create(() => {})
+    // TODO(benlesh): I'm not sure if this is really what you want here,
+    // but it's equivalent to what you were doing. You might want EMPTY
+    return NEVER
   }
 
   const vm = this
   const doc = document.documentElement
-  const obs$ = Rx.Observable.create(observer => {
+  const obs$ = new Observable(observer => {
     function listener (e) {
       if (!vm.$el) return
       if (selector === null && vm.$el === e.target) return observer.next(e)
@@ -22,7 +21,7 @@ export default function fromDOMEvent (selector, event) {
     }
     doc.addEventListener(event, listener)
     // Returns function which disconnects the $watch expression
-    return getDisposable(() => {
+    return new Subscription(() => {
       doc.removeEventListener(event, listener)
     })
   })

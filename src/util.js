@@ -1,51 +1,24 @@
-export let Rx
 export let Vue
 export let warn = function () {}
 
-export function install (_Vue, _Rx) {
-  Rx = _Rx
+// NOTE(benlesh): the value of this method seems dubious now, but I'm not sure
+// if this is a Vue convention I'm just not familiar with. Perhaps it would
+// be better to just import and use Vue directly?
+export function install (_Vue) {
   Vue = _Vue
   warn = Vue.util.warn || warn
 }
 
-export function hasRx (vm) {
-  if (!Rx) {
-    warn(
-      '$watchAsObservable requires Rx to be present globally or ' +
-      'be passed to Vue.use() as the second argument.',
-      vm
-    )
-    return false
-  }
-  return true
-}
-
+// TODO(benlesh): as time passes, this should be updated to use RxJS 6.1's
+// `isObservable` method. But wait until you're ready to drop support for Rx 5
 export function isObservable (ob) {
   return ob && typeof ob.subscribe === 'function'
 }
 
-export function isSubject (subject) {
+export function isObserver (subject) {
   return subject && (
-    typeof subject.next === 'function' ||
-    typeof subject.onNext === 'function'
+    typeof subject.next === 'function'
   )
-}
-
-export function unsub (handle) {
-  if (!handle) return
-  if (handle.dispose) {
-    handle.dispose()
-  } else if (handle.unsubscribe) {
-    handle.unsubscribe()
-  }
-}
-
-export function getDisposable (target) {
-  if (Rx.Subscription) { // Rx5
-    return new Rx.Subscription(target)
-  } else { // Rx4
-    return Rx.Disposable.create(target)
-  }
 }
 
 export function defineReactive (vm, key, val) {

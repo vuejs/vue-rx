@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import { WatchOptions } from 'vue'
-import { Observable } from 'rxjs/Observable'
+import { Observable } from 'rxjs'
 
 export type Observables = Record<string, Observable<any>>
 declare module 'vue/types/options' {
