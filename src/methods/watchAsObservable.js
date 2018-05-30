@@ -1,12 +1,8 @@
-import { Rx, hasRx, getDisposable } from '../util'
+import { Observable, Subscription } from 'rxjs'
 
 export default function watchAsObservable (expOrFn, options) {
-  if (!hasRx()) {
-    return
-  }
-
   const vm = this
-  const obs$ = Rx.Observable.create(observer => {
+  const obs$ = new Observable(observer => {
     let _unwatch
     const watch = () => {
       _unwatch = vm.$watch(expOrFn, (newValue, oldValue) => {
@@ -24,7 +20,7 @@ export default function watchAsObservable (expOrFn, options) {
     }
 
     // Returns function which disconnects the $watch expression
-    return getDisposable(() => {
+    return new Subscription(() => {
       _unwatch && _unwatch()
     })
   })
