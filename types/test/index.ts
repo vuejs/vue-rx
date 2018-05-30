@@ -35,7 +35,7 @@ const vm2 = new Vue({
     return {
       aPlusOne: this.$watchAsObservable('a').pipe(
         pluck('newValue'),
-        map((a: number) => a + 1),
+        map(a => (a as number) + 1),
       )
     }
   }
