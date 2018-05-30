@@ -4,6 +4,7 @@
   "description": "RxJS bindings for Vue",
   "main": "dist/vue-rx.js",
   "module": "dist/vue-rx.esm.js",
+  "sideEffects": false,
   "files": [
     "dist",
     "types/*.d.ts"
@@ -48,6 +49,9 @@
     "rxjs": "^6.2.0",
     "typescript": "^2.8.2",
     "vue": "^2.5.16"
+  },
+  "peerDependencies": {
+    "rxjs": "^6.0.0"
   },
   "eslintConfig": {
     "root": true,
