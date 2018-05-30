@@ -1,5 +1,5 @@
 <script src="https://unpkg.com/jquery"></script>
-<script src="https://unpkg.com/@reactivex/rxjs/dist/global/Rx.js"></script>
+<script src="https://unpkg.com/rxjs/bundles/rxjs.umd.js"></script>
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
 <script src="../dist/vue-rx.js"></script>
 
@@ -22,8 +22,11 @@
 </div>
 
 <script>
+const { from } = rxjs
+const { pluck, filter, debounceTime, distinctUntilChanged, switchMap, map } = rxjs.operators
+
 function fetchTerm (term) {
-  return Rx.Observable.fromPromise($.ajax({
+  return from($.ajax({
     url: 'http://en.wikipedia.org/w/api.php',
     dataType: 'jsonp',
     data: {
@@ -53,13 +56,14 @@ var vm = new Vue({
   subscriptions () {
     return {
       // this is the example in RxJS's readme.
-      results: this.$watchAsObservable('search')
-        .pluck('newValue')
-        .filter(text => text.length > 2)
-        .debounceTime(500)
-        .distinctUntilChanged()
-        .switchMap(fetchTerm)
-        .map(formatResult)
+      results: this.$watchAsObservable('search').pipe(
+        pluck('newValue'),
+        filter(text => text.length > 2),
+        debounceTime(500),
+        distinctUntilChanged(),
+        switchMap(fetchTerm),
+        map(formatResult)
+      )
     }
   }
 })</script>
