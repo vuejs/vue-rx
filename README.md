@@ -131,7 +131,7 @@ Finally, you can pass additional data to the stream using the alternative syntax
 This is useful when you need to pass along temporary variables like `v-for` iterators. You can get the data by simply plucking it from the source stream:
 
 ``` js
-const plusData$ = this.plus$.pluck('data')
+const plusData$ = this.plus$.pipe(pluck('data'))
 ```
 
 Starting in 3.1 you can also pass along extra options (passed along to native `addEventListener` as the 3rd argument):
