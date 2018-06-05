@@ -19,8 +19,8 @@ npm install vue vue-rx rxjs --save
 ```
 
 ```js
-import Vue from "vue";
-import VueRx from "vue-rx";
+import Vue from 'vue';
+import VueRx from 'vue-rx';
 
 Vue.use(VueRx);
 ```
@@ -44,7 +44,7 @@ Vue.use(VueRx);
 ```js
 // 用`subscriptions` 选项来配置 Rx observables
 new Vue({
-  el: "#app",
+  el: '#app',
   subscriptions: {
     msg: messageObservable
   }
@@ -93,8 +93,8 @@ vm.$observables.msg.subscribe(msg => console.log(msg));
 注意在渲染发生之前你需要在 vm 实例上声明一个 `rxjs.Subject` 实例 - `plus$`, 就像你声明数据那样. 你也可以在 `subscriptions` 函数中这样做.
 
 ```js
-import { Subject } from "rxjs";
-import { map, startWith, scan } from "rxjs/operators";
+import { Subject } from 'rxjs';
+import { map, startWith, scan } from 'rxjs/operators';
 
 new Vue({
   subscriptions() {
@@ -118,7 +118,7 @@ new Vue({
 ```js
 new Vue({
   // 需要传递 `Rx` 给 Vue.use() 暴露 `Subject`
-  domStreams: ["plus$"],
+  domStreams: ['plus$'],
   subscriptions() {
     // 使用 this.plus$
   }
@@ -134,7 +134,7 @@ new Vue({
 当你需要传递临时变量(例如 `v-for` 迭代), 这就非常有用了. 你可以通过从来源流简单地选取数据来获取想要的数据.
 
 ```js
-const plusData$ = this.plus$.pipe(pluck("data"));
+const plusData$ = this.plus$.pipe(pluck('data'));
 ```
 
 从 3.1 版本开始, 你可以传入额外的选项 (把第三方参数传入原生 `addEventListener`):
@@ -170,7 +170,7 @@ const plusData$ = this.plus$.pipe(pluck("data"));
 这是一个添加到实例的原型方法. 你可以根据一个值的 `watcher` 用它创建 obaervable . 值会以 `{ newValue, oldValue }`的格式触发:
 
 ```js
-import { pluck, map } from "rxjs/operators";
+import { pluck, map } from 'rxjs/operators';
 
 const vm = new Vue({
   data: {
@@ -179,8 +179,8 @@ const vm = new Vue({
   subscriptions() {
     // 用 Rx 操作符声明地映射成另一个属性
     return {
-      aPlusOne: this.$watchAsObservable("a").pipe(
-        pluck("newValue"),
+      aPlusOne: this.$watchAsObservable('a').pipe(
+        pluck('newValue'),
         map(a => a + 1)
       )
     };
@@ -188,10 +188,10 @@ const vm = new Vue({
 });
 
 // 或者产生副作用...
-vm.$watchAsObservable("a").subscribe(
-  ({ newValue, oldValue }) => console.log("stream value", newValue, oldValue),
+vm.$watchAsObservable('a').subscribe(
+  ({ newValue, oldValue }) => console.log('stream value', newValue, oldValue),
   err => console.error(err),
-  () => console.log("complete")
+  () => console.log('complete')
 );
 ```
 
@@ -202,22 +202,22 @@ vm.$watchAsObservable("a").subscribe(
 转化 vue.$on (包括声明周期事件) 到 Observables. 值会以 `{ name, msg }` 的格式触发:
 
 ```js
-import { interval } from "rxjs";
-import { take, takeUntil } from "rxjs/operators";
+import { interval } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
 
 const vm = new Vue({
   created() {
-    this.$eventToObservable("customEvent").subscribe(event =>
+    this.$eventToObservable('customEvent').subscribe(event =>
       console.log(event.name, event.msg)
     );
   }
 });
 
 // vm.$once vue-rx 版本
-this.$eventToObservable("customEvent").pipe(take(1));
+this.$eventToObservable('customEvent').pipe(take(1));
 
 // 另一种取消订阅的方法:
-let beforeDestroy$ = this.$eventToObservable("hook:beforeDestroy").pipe(
+let beforeDestroy$ = this.$eventToObservable('hook:beforeDestroy').pipe(
   take(1)
 );
 
@@ -229,7 +229,7 @@ interval(500).pipe(takeUntil(beforeDestroy$));
 这是一个添加到实例的原型方法. 你可以用它订阅一个 observable, 但是得让 VueRx 管理它的 dispose / unsubscribe.
 
 ```js
-import { interval } from "rxjs";
+import { interval } from 'rxjs';
 
 const vm = new Vue({
   mounted() {
@@ -247,13 +247,13 @@ const vm = new Vue({
 `selector` 用来查找组件根元素的后代节点, 如果你想监听根元素, 传入 `null` 作为第一个参数.
 
 ```js
-import { pluck } from "rxjs/operators";
+import { pluck } from 'rxjs/operators';
 
 const vm = new Vue({
   subscriptions() {
     return {
-      inputValue: this.$fromDOMEvent("input", "keyup").pipe(
-        pluck("target", "value")
+      inputValue: this.$fromDOMEvent('input', 'keyup').pipe(
+        pluck('target', 'value')
       )
     };
   }
@@ -275,7 +275,7 @@ const vm = new Vue({
   subscriptions() {
     return {
       // 需要 `share` 操作符
-      formData: this.$createObservableMethod("submitHandler")
+      formData: this.$createObservableMethod('submitHandler')
     };
   }
 });
@@ -286,7 +286,7 @@ const vm = new Vue({
 ```js
 new Vue({
   observableMethods: {
-    submitHandler: "submitHandler$"
+    submitHandler: 'submitHandler$'
     // 或者使用数组简写: ['submitHandler']
   }
 });
