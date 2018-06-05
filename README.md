@@ -1,6 +1,7 @@
 # vue-rx [![Build Status](https://circleci.com/gh/vuejs/vue-rx/tree/master.svg?style=shield)](https://circleci.com/gh/vuejs/vue-rx/tree/master)
 
 English | [简体中文](README-CN.md)
+
 [RxJS v6](https://github.com/ReactiveX/rxjs) integration for Vue.js.
 
 > **BREAKING CHANGES from 5.0**

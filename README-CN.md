@@ -1,9 +1,10 @@
 # vue-rx [![Build Status](https://circleci.com/gh/vuejs/vue-rx/tree/master.svg?style=shield)](https://circleci.com/gh/vuejs/vue-rx/tree/master)
 
 [English](README.md) | 简体中文
+
 [RxJS v6](https://github.com/ReactiveX/rxjs) 集成到 Vue.js.
 
-> ** 相比 5.0 的破坏式更新 **
+> **相比 5.0 的破坏式更新**
 >
 > - vue-rx v6 现在默认只对 RxJS V6 生效. 如果你想继续使用 RxJS v5 风格的代码, 安装 `rxjs-compat`.
 
