@@ -25,11 +25,11 @@ import VueRx from 'vue-rx';
 Vue.use(VueRx);
 ```
 
-webpack 打包默认会使用`dist/vue-rx.esm.js`。 这样引入最小数量的 Rx 操作符并且保证了最小的打包体积。
+webpack 打包默认会使用 `dist/vue-rx.esm.js`。 这样引入最小数量的 Rx 操作符并且保证了最小的打包体积。
 
 #### 全局脚本
 
-如果要在浏览器环境使用，需要引入 UMD 构建版本 `dist/vue-rx.js`。在浏览器环境中的 UMD 构建版本会假设 `window.rxjs` 已经存在，因此你需要确保在 Vue.js 和 RxJS 之后引入 `vue-rx.js`。如果 `window.Vue` 存在的话，`vue-rx`会自动安装。
+如果要在浏览器环境使用，需要引入 UMD 构建版本 `dist/vue-rx.js`。在浏览器环境中的 UMD 构建版本会假设 `window.rxjs` 已经存在，因此你需要确保在 Vue.js 和 RxJS 之后引入 `vue-rx.js`。如果 `window.Vue` 存在的话，`vue-rx` 会自动安装。
 
 例子:
 
@@ -70,7 +70,7 @@ Vue.component('foo', {
 })
 ```
 
-Observables 会以 `vm.$observables`的形式暴露：
+Observables 会以 `vm.$observables` 的形式暴露：
 
 ```js
 const vm = new Vue({
@@ -84,7 +84,7 @@ vm.$observables.msg.subscribe(msg => console.log(msg));
 
 ### `v-stream`：流式 DOM 事件
 
-`vue-rx` 提供 `v-stream` 让你向一个 Rx Subject 流式发送 DOM 事件。语法和 `v-on`相似，指令参数对应事件名，绑定值对应 Rx Subject。
+`vue-rx` 提供 `v-stream` 让你向一个 Rx Subject 流式发送 DOM 事件。语法和 `v-on` 相似，指令参数对应事件名，绑定值对应 Rx Subject。
 
 ```html
 <button v-stream:click="plus$">+</button>
@@ -167,7 +167,7 @@ const plusData$ = this.plus$.pipe(pluck('data'));
 
 #### `$watchAsObservable(expOrFn, [options])`
 
-这是一个添加到实例的原型方法。你可以根据一个值的侦听器创建 observable。值会以 `{ newValue, oldValue }`的格式触发：
+这是一个添加到实例的原型方法。你可以根据一个值的侦听器创建 observable。值会以 `{ newValue, oldValue }` 的格式触发：
 
 ```js
 import { pluck, map } from 'rxjs/operators';
