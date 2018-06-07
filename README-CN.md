@@ -12,7 +12,7 @@
 
 #### NPM + ES2015
 
-**`rxjs` 需要作为　peer dependency　引入。**
+**`rxjs` 需要作为 peer dependency 引入。**
 
 ```bash
 npm install vue vue-rx rxjs --save
@@ -137,7 +137,7 @@ new Vue({
 const plusData$ = this.plus$.pipe(pluck('data'));
 ```
 
-从 3.1 版本开始，你可以传入额外的选项 (作为第三个参数一起传入原生的 `addEventListener`)：
+从 3.1 版本开始，你可以传入额外的选项(作为第三个参数一起传入原生的 `addEventListener`)：
 
 ```html
 <button v-stream:click="{
@@ -151,7 +151,7 @@ const plusData$ = this.plus$.pipe(pluck('data'));
 
 ### `v-stream`：从子组件流式发送自定义事件
 
-跟流式 `DOM` 事件很相似，`v-stream` 也可以被用于组件，它会根据子组件触发的自定义事件创建 observables。 运作方式跟 `v-on` 相似：
+跟流式 `DOM` 事件很相似，`v-stream` 也可以被用于组件，它会根据子组件触发的自定义事件创建 observables。运作方式跟 `v-on` 相似：
 
 ```html
 <div>
@@ -167,7 +167,7 @@ const plusData$ = this.plus$.pipe(pluck('data'));
 
 #### `$watchAsObservable(expOrFn, [options])`
 
-这是一个添加到实例的原型方法。你可以根据一个值的侦听器创建 observable。 值会以 `{ newValue, oldValue }`的格式触发：
+这是一个添加到实例的原型方法。你可以根据一个值的侦听器创建 observable。值会以 `{ newValue, oldValue }`的格式触发：
 
 ```js
 import { pluck, map } from 'rxjs/operators';
@@ -199,7 +199,7 @@ vm.$watchAsObservable('a').subscribe(
 
 #### `$eventToObservable(event)`
 
-转化 vue.$on (包括声明周期事件) 到 Observables。 值会以 `{ name, msg }` 的格式触发：
+转化 vue.$on(包括生命周期事件)到 Observables。值会以 `{ name, msg }` 的格式触发：
 
 ```js
 import { interval } from 'rxjs';
@@ -226,7 +226,7 @@ interval(500).pipe(takeUntil(beforeDestroy$));
 
 #### `$subscribeTo(observable, next, error, complete)`
 
-这是一个添加到实例的原型方法。你可以用它订阅一个 observable，但是得让 VueRx 管理它的 dispose / unsubscribe。
+这是一个添加到实例的原型方法。你可以用它订阅一个 observable，但是得让 VueRx 管理它的 dispose/unsubscribe。
 
 ```js
 import { interval } from 'rxjs';
@@ -264,7 +264,7 @@ const vm = new Vue({
 
 转化函数调用为输出调用参数的 observable 队列。
 
-这是一个添加到实例的原型方法。 用来根据函数名创建一个共享的，热的 observable。这个函数会被赋值到 vm 方法上去。
+这是一个添加到实例的原型方法。用来根据函数名创建一个共享的，热的 observable。这个函数会被赋值到 vm 方法上去。
 
 ```html
 <custom-form :onSubmit="submitHandler"></custom-form>
@@ -281,7 +281,7 @@ const vm = new Vue({
 });
 ```
 
-你可以使用 `observableMethods` 选项 使代码更加声明式：
+你可以使用 `observableMethods` 选项使代码更加声明式：
 
 ```js
 new Vue({
@@ -305,7 +305,7 @@ new Vue({
 
 ### 示例
 
-到 `/examples`　目录查看一些简单示例。
+到 `/examples` 目录查看一些简单示例。
 
 ### License
 
