@@ -100,7 +100,7 @@ new Vue({
     // declare the receiving Subjects
     this.plus$ = new Subject()
     // ...then create subscriptions using the Subjects as source stream.
-    // the source stream emits in the form of { event: HTMLEvent, data?: any }
+    // the source stream emits in the format of `{ event: HTMLEvent, data?: any }`
     return {
       count: this.plus$.pipe(
         map(() => 1),
