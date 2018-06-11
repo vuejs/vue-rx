@@ -1,5 +1,7 @@
 # vue-rx [![Build Status](https://circleci.com/gh/vuejs/vue-rx/tree/master.svg?style=shield)](https://circleci.com/gh/vuejs/vue-rx/tree/master)
 
+English | [简体中文](README-CN.md)
+
 [RxJS v6](https://github.com/ReactiveX/rxjs) integration for Vue.js.
 
 > **BREAKING CHANGES from 5.0**
@@ -98,7 +100,7 @@ new Vue({
     // declare the receiving Subjects
     this.plus$ = new Subject()
     // ...then create subscriptions using the Subjects as source stream.
-    // the source stream emits in the form of { event: HTMLEvent, data?: any }
+    // the source stream emits in the format of `{ event: HTMLEvent, data?: any }`
     return {
       count: this.plus$.pipe(
         map(() => 1),
