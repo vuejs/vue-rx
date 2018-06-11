@@ -25,7 +25,7 @@ import VueRx from 'vue-rx';
 Vue.use(VueRx);
 ```
 
-webpack 打包默认会使用 `dist/vue-rx.esm.js`。 这样引入最小数量的 Rx 操作符并且保证了最小的打包体积。
+webpack 打包默认会使用 `dist/vue-rx.esm.js`。这样引入最小数量的 Rx 操作符并且保证了最小的打包体积。
 
 #### 全局脚本
 
@@ -147,7 +147,7 @@ const plusData$ = this.plus$.pipe(pluck('data'));
 }">+</button>
 ```
 
-更具体的用法请查阅 [实例](https://github.com/vuejs/vue-rx/blob/master/example/counter.html)。
+更具体的用法请查阅[实例](https://github.com/vuejs/vue-rx/blob/master/example/counter.html)。
 
 ### `v-stream`：从子组件流式发送自定义事件
 
@@ -199,7 +199,7 @@ vm.$watchAsObservable('a').subscribe(
 
 #### `$eventToObservable(event)`
 
-转化 vue.$on(包括生命周期事件)到 Observables。值会以 `{ name, msg }` 的格式触发：
+转化 `vue.$on` (包括生命周期事件) 到 Observables。值会以 `{ name, msg }` 的格式触发：
 
 ```js
 import { interval } from 'rxjs';
@@ -301,7 +301,7 @@ new Vue({
 
 ### 注意事项
 
-你不能使用 `watch` 选项去侦听订阅(subscriptions)，因为它在设置订阅之前就被处理完毕了。但是你可以在 `created` 钩子中使用 `$watch` 作为替代方案。
+你不能使用 `watch` 选项去侦听订阅 (subscriptions)，因为它在设置订阅之前就被处理完毕了。但是你可以在 `created` 钩子中使用 `$watch` 作为替代方案。
 
 ### 示例
 
