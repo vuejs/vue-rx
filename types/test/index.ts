@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import * as VueRX from '../index'
+import VueRX from '../index'
 import { interval }from 'rxjs'
 import { pluck, map } from 'rxjs/operators'
 
