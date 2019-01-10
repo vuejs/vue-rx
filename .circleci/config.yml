@@ -1,0 +1,27 @@
+version: 2
+
+jobs:
+  build:
+    docker:
+      - image: vuejs/ci
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - dependency-cache-{{ checksum "package.json" }}
+          - dependency-cache-
+      - run: npm install
+      - run: npm run test
+      - run: npm run lint
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - build
