@@ -28,7 +28,7 @@
   "scripts": {
     "dev": "rollup -c rollup.config.js -w",
     "build": "rollup -c rollup.config.js",
-    "lint": "eslint src test example --fix",
+    "lint": "eslint src test example",
     "test": "npm run test:unit && npm run test:types",
     "test:unit": "jest",
     "test:types": "tsc -p types/test",
