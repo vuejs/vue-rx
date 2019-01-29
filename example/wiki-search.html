@@ -1,4 +1,3 @@
-<script src="https://unpkg.com/jquery"></script>
 <script src="https://unpkg.com/rxjs/bundles/rxjs.umd.js"></script>
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
 <script src="../dist/vue-rx.js"></script>
@@ -23,18 +22,14 @@
 
 <script>
 const { from } = rxjs
+const { ajax } = rxjs.ajax
 const { pluck, filter, debounceTime, distinctUntilChanged, switchMap, map } = rxjs.operators
 
+const baseUrl =
+  'https://en.wikipedia.org/w/api.php?action=opensearch&format=json&origin=*'
+
 function fetchTerm (term) {
-  return from($.ajax({
-    url: 'http://en.wikipedia.org/w/api.php',
-    dataType: 'jsonp',
-    data: {
-      action: 'opensearch',
-      format: 'json',
-      search: term
-    }
-  }).promise())
+  return ajax.getJSON(`${baseUrl}&search=${term}`)
 }
 
 function formatResult (res) {
