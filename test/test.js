@@ -6,34 +6,17 @@ const Vue = require('vue/dist/vue.js')
 const VueRx = require('../dist/vue-rx.js')
 
 // library
-const Observable = require('rxjs/Observable').Observable
-const Subject = require('rxjs/Subject').Subject
-const Subscription = require('rxjs/Subscription').Subscription
-require('rxjs/add/observable/fromEvent')
-require('rxjs/add/operator/share')
-
-// user
-require('rxjs/add/operator/map')
-require('rxjs/add/operator/startWith')
-require('rxjs/add/operator/scan')
-require('rxjs/add/operator/pluck')
-require('rxjs/add/operator/merge')
-require('rxjs/add/operator/filter')
-
-const miniRx = {
-  Observable,
-  Subscription,
-  Subject
-}
+const { Observable } = require('rxjs')
+const { map, scan, pluck, merge, tap, filter, startWith } = require('rxjs/operators')
 
 Vue.config.productionTip = false
-Vue.use(VueRx, miniRx)
+Vue.use(VueRx)
 
 const nextTick = Vue.nextTick
 
 function mock () {
   let observer
-  const observable = Observable.create(_observer => {
+  const observable = new Observable(_observer => {
     observer = _observer
   })
   return {
@@ -57,7 +40,9 @@ test('expose $observables', () => {
 
   const vm = new Vue({
     subscriptions: {
-      hello: ob.startWith(0)
+      hello: ob.pipe(
+        startWith(0),
+      )
     }
   })
 
@@ -77,7 +62,7 @@ test('bind subscriptions to render', done => {
 
   const vm = new Vue({
     subscriptions: {
-      hello: ob.startWith('foo')
+      hello: ob.pipe(startWith('foo'))
     },
     render (h) {
       return h('div', this.hello)
@@ -106,7 +91,7 @@ test('subscriptions() has access to component state', () => {
     },
     subscriptions () {
       return {
-        hello: ob.startWith(this.foo + this.bar)
+        hello: ob.pipe(startWith(this.foo + this.bar))
       }
     },
     render (h) {
@@ -119,11 +104,20 @@ test('subscriptions() has access to component state', () => {
 
 test('subscriptions() can throw error properly', done => {
   const { ob, next } = mock()
+  let thrownError
 
   const vm = new Vue({
     subscriptions () {
       return {
-        num: ob.startWith(1).map(n => n.toFixed())
+        num: ob.pipe(
+          startWith(1),
+          map(n => n.toFixed()),
+          tap({
+            error (err) {
+              thrownError = err
+            }
+          })
+        )
       }
     },
     render (h) {
@@ -132,11 +126,13 @@ test('subscriptions() can throw error properly', done => {
   }).$mount()
 
   nextTick(() => {
-    expect(() => {
-      next(null)
-    }).toThrow()
-    expect(vm.$el.textContent).toBe('1')
-    done()
+    next(null)
+
+    nextTick(() => {
+      expect(thrownError).toBeDefined()
+      expect(vm.$el.textContent).toBe('1')
+      done()
+    })
   })
 })
 
@@ -151,9 +147,11 @@ test('v-stream directive (basic)', done => {
     domStreams: ['click$'],
     subscriptions () {
       return {
-        count: this.click$.map(() => 1)
-          .startWith(0)
-          .scan((total, change) => total + change)
+        count: this.click$.pipe(
+          map(() => 1),
+          startWith(0),
+          scan((total, change) => total + change),
+        )
       }
     }
   }).$mount()
@@ -183,12 +181,13 @@ test('v-stream directive (with .native modify)', done => {
     domStreams: ['clickNative$', 'click$'],
     subscriptions () {
       return {
-        count: this.clickNative$
-          .merge(this.click$)
-          .filter(e => e.event.target && e.event.target.id === 'btn-native')
-          .map(() => 1)
-          .startWith(0)
-          .scan((total, change) => total + change)
+        count: this.clickNative$.pipe(
+          merge(this.click$),
+          filter(e => e.event.target && e.event.target.id === 'btn-native'),
+          map(() => 1),
+          startWith(0),
+          scan((total, change) => total + change),
+        )
       }
     }
   }).$mount()
@@ -215,8 +214,12 @@ test('v-stream directive (with .stop, .prevent modify)', done => {
     domStreams: ['clickStop$', 'clickPrevent$'],
     subscriptions () {
       return {
-        stoped: this.clickStop$.map(x => x.event.cancelBubble),
-        prevented: this.clickPrevent$.map(x => x.event.defaultPrevented)
+        stoped: this.clickStop$.pipe(
+          map(x => x.event.cancelBubble),
+        ),
+        prevented: this.clickPrevent$.pipe(
+          map(x => x.event.defaultPrevented),
+        )
       }
     }
   }).$mount()
@@ -243,9 +246,11 @@ test('v-stream directive (with data)', done => {
     domStreams: ['click$'],
     subscriptions () {
       return {
-        count: this.click$.pluck('data')
-          .startWith(0)
-          .scan((total, change) => total + change)
+        count: this.click$.pipe(
+          pluck('data'),
+          startWith(0),
+          scan((total, change) => total + change),
+        )
       }
     }
   }).$mount()
@@ -278,9 +283,11 @@ test('v-stream directive (multiple bindings on same node)', done => {
     domStreams: ['plus$'],
     subscriptions () {
       return {
-        count: this.plus$.pluck('data')
-          .startWith(0)
-          .scan((total, change) => total + change)
+        count: this.plus$.pipe(
+          pluck('data'),
+          startWith(0),
+          scan((total, change) => total + change),
+        )
       }
     }
   }).$mount()
@@ -308,9 +315,11 @@ test('$fromDOMEvent()', done => {
     subscriptions () {
       const click$ = this.$fromDOMEvent('button', 'click')
       return {
-        count: click$.map(() => 1)
-          .startWith(0)
-          .scan((total, change) => total + change)
+        count: click$.pipe(
+          map(() => 1),
+          startWith(0),
+          scan((total, change) => total + change),
+        )
       }
     }
   }).$mount()

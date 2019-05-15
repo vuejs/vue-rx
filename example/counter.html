@@ -1,6 +1,6 @@
 <!-- this demo requires a browser that natively supports ES2015 -->
 
-<script src="https://unpkg.com/@reactivex/rxjs/dist/global/Rx.js"></script>
+<script src="https://unpkg.com/rxjs/bundles/rxjs.umd.js"></script>
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
 <script src="../dist/vue-rx.js"></script>
 
@@ -25,6 +25,9 @@
 </div>
 
 <script>
+const { merge } = rxjs
+const { map, pluck, startWith, scan } = rxjs.operators
+
 new Vue({
   el: '#app',
 
@@ -37,7 +40,7 @@ new Vue({
 
   components: {
     myButton: {
-      template: '<button>MyButton</button>'
+      template: `<button @click="$emit('click')">MyButton</button>`
     }
   },
 
@@ -52,16 +55,14 @@ new Vue({
   domStreams: ['plus$', 'minus$'],
 
   subscriptions () {
-    var count$ = Rx.Observable
-      .merge(
-        this.plus$.map(() => 1),
-        this.minus$.pluck('data')
-      )
-      .startWith(0)
-      .scan((total, change) => total + change)
-
     return {
-      count: count$
+      count: merge(
+        this.plus$.pipe(map(() => 1)),
+        this.minus$.pipe(pluck('data'))
+      ).pipe(
+        startWith(0),
+        scan((total, change) => total + change)
+      )
     }
   }
 })

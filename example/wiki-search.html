@@ -1,5 +1,4 @@
-<script src="https://unpkg.com/jquery"></script>
-<script src="https://unpkg.com/@reactivex/rxjs/dist/global/Rx.js"></script>
+<script src="https://unpkg.com/rxjs/bundles/rxjs.umd.js"></script>
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
 <script src="../dist/vue-rx.js"></script>
 
@@ -22,16 +21,15 @@
 </div>
 
 <script>
+const { from } = rxjs
+const { ajax } = rxjs.ajax
+const { pluck, filter, debounceTime, distinctUntilChanged, switchMap, map } = rxjs.operators
+
+const baseUrl =
+  'https://en.wikipedia.org/w/api.php?action=opensearch&format=json&origin=*'
+
 function fetchTerm (term) {
-  return Rx.Observable.fromPromise($.ajax({
-    url: 'http://en.wikipedia.org/w/api.php',
-    dataType: 'jsonp',
-    data: {
-      action: 'opensearch',
-      format: 'json',
-      search: term
-    }
-  }).promise())
+  return ajax.getJSON(`${baseUrl}&search=${term}`)
 }
 
 function formatResult (res) {
@@ -53,13 +51,14 @@ var vm = new Vue({
   subscriptions () {
     return {
       // this is the example in RxJS's readme.
-      results: this.$watchAsObservable('search')
-        .pluck('newValue')
-        .filter(text => text.length > 2)
-        .debounceTime(500)
-        .distinctUntilChanged()
-        .switchMap(fetchTerm)
-        .map(formatResult)
+      results: this.$watchAsObservable('search').pipe(
+        pluck('newValue'),
+        filter(text => text.length > 2),
+        debounceTime(500),
+        distinctUntilChanged(),
+        switchMap(fetchTerm),
+        map(formatResult)
+      )
     }
   }
 })</script>

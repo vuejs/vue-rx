@@ -1,17 +1,14 @@
-import { Rx, defineReactive, isObservable, warn, unsub } from './util'
+import { defineReactive, isObservable, warn } from './util'
+import { Subject, Subscription } from 'rxjs'
 
 export default {
   created () {
     const vm = this
     const domStreams = vm.$options.domStreams
     if (domStreams) {
-      if (!Rx.Subject) {
-        warn('Rx.Subject is required to use the "domStreams" option.')
-      } else {
-        domStreams.forEach(key => {
-          vm[key] = new Rx.Subject()
-        })
-      }
+      domStreams.forEach(key => {
+        vm[key] = new Subject()
+      })
     }
 
     const observableMethods = vm.$options.observableMethods
@@ -33,7 +30,7 @@ export default {
     }
     if (obs) {
       vm.$observables = {}
-      vm._obSubscriptions = []
+      vm._subscription = new Subscription()
       Object.keys(obs).forEach(key => {
         defineReactive(vm, key, undefined)
         const ob = vm.$observables[key] = obs[key]
@@ -44,7 +41,7 @@ export default {
           )
           return
         }
-        vm._obSubscriptions.push(obs[key].subscribe(value => {
+        vm._subscription.add(obs[key].subscribe(value => {
           vm[key] = value
         }, (error) => { throw error }))
       })
@@ -52,8 +49,8 @@ export default {
   },
 
   beforeDestroy () {
-    if (this._obSubscriptions) {
-      this._obSubscriptions.forEach(unsub)
+    if (this._subscription) {
+      this._subscription.unsubscribe()
     }
   }
 }

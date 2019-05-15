@@ -1,4 +1,4 @@
-/* global Vue, Rx */
+/* global Vue */
 
 import { install } from './util'
 import rxMixin from './mixin'
@@ -9,8 +9,8 @@ import subscribeTo from './methods/subscribeTo'
 import eventToObservable from './methods/eventToObservable'
 import createObservableMethod from './methods/createObservableMethod'
 
-export default function VueRx (Vue, Rx) {
-  install(Vue, Rx)
+export default function VueRx (Vue) {
+  install(Vue)
   Vue.mixin(rxMixin)
   Vue.directive('stream', streamDirective)
   Vue.prototype.$watchAsObservable = watchAsObservable
@@ -18,9 +18,10 @@ export default function VueRx (Vue, Rx) {
   Vue.prototype.$subscribeTo = subscribeTo
   Vue.prototype.$eventToObservable = eventToObservable
   Vue.prototype.$createObservableMethod = createObservableMethod
+  Vue.config.optionMergeStrategies.subscriptions = Vue.config.optionMergeStrategies.data
 }
 
 // auto install
-if (typeof Vue !== 'undefined' && typeof Rx !== 'undefined') {
-  Vue.use(VueRx, Rx)
+if (typeof Vue !== 'undefined') {
+  Vue.use(VueRx)
 }
