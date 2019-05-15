@@ -1,22 +1,23 @@
 import Vue from 'vue'
-import * as VueRX from '../index'
-import * as Rx from 'rxjs/Rx'
+import VueRX from '../index'
+import { interval }from 'rxjs'
+import { pluck, map } from 'rxjs/operators'
 
-Vue.use(VueRX, Rx)
+Vue.use(VueRX)
 
 const vm1 = new Vue({
   el: '#app',
   subscriptions: {
-    msg: Rx.Observable.interval(100)
+    msg: interval(100)
   }
 })
 
-vm1.$observables.msg.subscribe(msg => console.log(msg))
+vm1.$observables.msg.subscribe((msg: any) => console.log(msg))
 
 Vue.component('foo', {
   subscriptions: function () {
     return {
-      msg: Rx.Observable.interval(100)
+      msg: interval(100)
     }
   }
 })
@@ -32,9 +33,10 @@ const vm2 = new Vue({
   subscriptions () {
     // declaratively map to another property with Rx operators
     return {
-      aPlusOne: this.$watchAsObservable('a')
-        .pluck('newValue')
-        .map((a: number) => a + 1)
+      aPlusOne: this.$watchAsObservable('a').pipe(
+        pluck('newValue'),
+        map(a => (a as number) + 1),
+      )
     }
   }
 })
@@ -42,8 +44,8 @@ const vm2 = new Vue({
 // or produce side effects...
 vm2.$watchAsObservable('a')
   .subscribe(
-    ({ newValue, oldValue }) => console.log('stream value', newValue, oldValue),
-    err => console.error(err),
+    ({ newValue, oldValue }: { newValue: number, oldValue: number }) => console.log('stream value', newValue, oldValue),
+    (err: any) => console.error(err),
     () => console.log('complete')
   )
 
@@ -51,13 +53,13 @@ vm2.$watchAsObservable('a')
 new Vue({
   created () {
     this.$eventToObservable('customEvent')
-    .subscribe((event) => console.log(event.name,event.msg))
+      .subscribe((event: { name: string, msg: string }) => console.log(event.name,event.msg))
   }
 })
 
 new Vue({
   mounted () {
-    this.$subscribeTo(Rx.Observable.interval(1000), function (count) {
+    this.$subscribeTo(interval(1000), function (count) {
       console.log(count)
     })
   }
@@ -66,7 +68,9 @@ new Vue({
 new Vue({
   subscriptions () {
     return {
-      inputValue: this.$fromDOMEvent('input', 'keyup').pluck('target', 'value')
+      inputValue: this.$fromDOMEvent('input', 'keyup').pipe(
+        pluck('target', 'value')
+      )
     }
   }
 })

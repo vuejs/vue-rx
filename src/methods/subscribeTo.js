@@ -1,5 +1,7 @@
+import { Subscription } from 'rxjs'
+
 export default function subscribeTo (observable, next, error, complete) {
-  var obs$ = observable.subscribe(next, error, complete)
-  ;(this._obSubscriptions || (this._obSubscriptions = [])).push(obs$)
-  return obs$
+  const subscription = observable.subscribe(next, error, complete)
+  ;(this._subscription || (this._subscription = new Subscription())).add(subscription)
+  return subscription
 }

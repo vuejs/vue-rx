@@ -2,11 +2,16 @@
 
 English | [简体中文](README-CN.md)
 
-Simple [RxJS](https://github.com/Reactive-Extensions/RxJS) binding for Vue.js. It also supports subscriptions for generic observables that implement the `.subscribe` and `.unsubscribe` (or `.dispose`) interface. For example, you can use it to subscribe to `most.js` or Falcor streams, but some features require RxJS to work.
+[RxJS v6](https://github.com/ReactiveX/rxjs) integration for Vue.js.
+
+> **BREAKING CHANGES from 5.0**
+> - vue-rx v6 now only works with RxJS v6 by default. If you want to keep using RxJS v5 style code, install `rxjs-compat`.
 
 ### Installation
 
 #### NPM + ES2015
+
+**`rxjs` is required as a peer dependency.**
 
 ``` bash
 npm install vue vue-rx rxjs --save
@@ -14,35 +19,24 @@ npm install vue vue-rx rxjs --save
 
 ``` js
 import Vue from 'vue'
-import Rx from 'rxjs/Rx'
 import VueRx from 'vue-rx'
 
-// tada!
-Vue.use(VueRx, Rx)
+Vue.use(VueRx)
 ```
 
-#### Tips for Reducing Bundle Size
-
-In most cases, you probably don't need the full build of Rx. You can reduce the amount of code included in your bundle by doing the following:
-
-``` js
-import Vue from 'vue'
-import VueRx from 'vue-rx'
-import { Observable } from 'rxjs/Observable'
-import { Subscription } from 'rxjs/Subscription' // Disposable if using RxJS4
-import { Subject } from 'rxjs/Subject' // required for domStreams option
-
-// tada!
-Vue.use(VueRx, {
-  Observable,
-  Subscription,
-  Subject
-})
-```
+When bundling via webpack, `dist/vue-rx.esm.js` is used by default. It imports the minimal amount of Rx operators and ensures small bundle sizes.
 
 #### Global Script
 
-Just make sure to include `vue-rx.js` after Vue.js and RxJS. It will be installed automatically.
+To use in a browser environment, use the UMD build `dist/vue-rx.js`. When in a browser environment, the UMD build assumes `window.rxjs` to be already present, so make sure to include `vue-rx.js` after Vue.js and RxJS. It also installs itself automatically if `window.Vue` is present.
+
+Example:
+
+``` html
+<script src="https://unpkg.com/rxjs/bundles/rxjs.umd.js"></script>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="../dist/vue-rx.js"></script>
+```
 
 ### Usage
 
@@ -64,10 +58,12 @@ new Vue({
 The `subscriptions` options can also take a function so that you can return unique observables for each component instance:
 
 ``` js
+import { Observable } from 'rxjs'
+
 Vue.component('foo', {
   subscriptions: function () {
     return {
-      msg: Rx.Observable.create(...)
+      msg: new Observable(...)
     }
   }
 })
@@ -76,7 +72,7 @@ Vue.component('foo', {
 The observables are exposed as `vm.$observables`:
 
 ``` js
-var vm = new Vue({
+const vm = new Vue({
   subscriptions: {
     msg: messageObservable
   }
@@ -87,29 +83,30 @@ vm.$observables.msg.subscribe(msg => console.log(msg))
 
 ### `v-stream`: Streaming DOM Events
 
-> New in 3.0
-
-> This feature requires RxJS.
-
 `vue-rx` provides the `v-stream` directive which allows you to stream DOM events to an Rx Subject. The syntax is similar to `v-on` where the directive argument is the event name, and the binding value is the target Rx Subject.
 
 ``` html
 <button v-stream:click="plus$">+</button>
 ```
 
-Note that you need to declare `plus$` as an instance of `Rx.Subject` on the vm instance before the render happens, just like you need to declare data. You can do that right in the `subscriptions` function:
+Note that you need to declare `plus$` as an instance of `rxjs.Subject` on the vm instance before the render happens, just like you need to declare data. You can do that right in the `subscriptions` function:
 
 ``` js
+import { Subject } from 'rxjs'
+import { map, startWith, scan } from 'rxjs/operators'
+
 new Vue({
   subscriptions () {
     // declare the receiving Subjects
-    this.plus$ = new Rx.Subject()
+    this.plus$ = new Subject()
     // ...then create subscriptions using the Subjects as source stream.
-    // the source stream emits in the form of { event: HTMLEvent, data?: any }
+    // the source stream emits in the format of `{ event: HTMLEvent, data?: any }`
     return {
-      count: this.plus$.map(() => 1)
-        .startWith(0)
-        .scan((total, change) => total + change)
+      count: this.plus$.pipe(
+        map(() => 1),
+        startWith(0),
+        scan((total, change) => total + change)
+      )
     }
   }
 })
@@ -136,7 +133,7 @@ Finally, you can pass additional data to the stream using the alternative syntax
 This is useful when you need to pass along temporary variables like `v-for` iterators. You can get the data by simply plucking it from the source stream:
 
 ``` js
-const plusData$ = this.plus$.pluck('data')
+const plusData$ = this.plus$.pipe(pluck('data'))
 ```
 
 Starting in 3.1 you can also pass along extra options (passed along to native `addEventListener` as the 3rd argument):
@@ -151,25 +148,40 @@ Starting in 3.1 you can also pass along extra options (passed along to native `a
 
 See [example](https://github.com/vuejs/vue-rx/blob/master/example/counter.html) for actual usage.
 
+### `v-stream`: Streaming Custom Events from Child Components
+
+Similar to streaming `DOM` events, `v-stream` can be used on components as well and will create observables from custom events emitted by the child component. It works similar to `v-on`:
+
+```html
+<div>
+  <!-- Custom component -->
+  <pagination v-on:change="pageChanged()"></pagination>
+
+  <!-- v-stream with custom component -->
+  <pagination v-stream:change="pageChange$"></pagination>
+</div>
+```
+
 ### Other API Methods
 
 #### `$watchAsObservable(expOrFn, [options])`
 
-> This feature requires RxJS.
-
 This is a prototype method added to instances. You can use it to create an observable from a value watcher. The emitted value is in the format of `{ newValue, oldValue }`:
 
 ``` js
-var vm = new Vue({
+import { pluck, map } from 'rxjs/operators'
+
+const vm = new Vue({
   data: {
     a: 1
   },
   subscriptions () {
     // declaratively map to another property with Rx operators
     return {
-      aPlusOne: this.$watchAsObservable('a')
-        .pluck('newValue')
-        .map(a => a + 1)
+      aPlusOne: this.$watchAsObservable('a').pipe(
+        pluck('newValue'),
+        map(a => a + 1)
+      )
     }
   }
 })
@@ -187,12 +199,13 @@ The optional `options` object accepts the same options as `vm.$watch`.
 
 #### `$eventToObservable(event)`
 
-> This feature requires RxJS.
-
 Convert vue.$on (including lifecycle events) to Observables. The emitted value is in the format of `{ name, msg }`:
 
 ``` js
-var vm = new Vue({
+import { interval } from 'rxjs'
+import { take, takeUntil } from 'rxjs/operators'
+
+const vm = new Vue({
   created () {
     this.$eventToObservable('customEvent')
 	  .subscribe((event) => console.log(event.name,event.msg))
@@ -200,13 +213,15 @@ var vm = new Vue({
 })
 
 // vm.$once vue-rx version
-this.$eventToObservable('customEvent')
-  .take(1)
+this.$eventToObservable('customEvent').pipe(
+  take(1)
+)
 
 // Another way to auto unsub:
-let beforeDestroy$ = this.$eventToObservable('hook:beforeDestroy').take(1)
-Rx.Observable.interval(500)
-  .takeUntil(beforeDestroy$)
+let beforeDestroy$ = this.$eventToObservable('hook:beforeDestroy').pipe(take(1))
+
+interval(500)
+  .pipe(takeUntil(beforeDestroy$))
 ```
 
 #### `$subscribeTo(observable, next, error, complete)`
@@ -214,9 +229,11 @@ Rx.Observable.interval(500)
 This is a prototype method added to instances. You can use it to subscribe to an observable, but let VueRx manage the dispose/unsubscribe.
 
 ``` js
-var vm = new Vue({
+import { interval } from 'rxjs'
+
+const vm = new Vue({
   mounted () {
-    this.$subscribeTo(Rx.Observable.interval(1000), function (count) {
+    this.$subscribeTo(interval(1000), function (count) {
       console.log(count)
     })
   }
@@ -225,25 +242,25 @@ var vm = new Vue({
 
 #### `$fromDOMEvent(selector, event)`
 
-> This feature requires RxJS.
-
 This is a prototype method added to instances. Use it to create an observable from DOM events within the instances' element. This is similar to `Rx.Observable.fromEvent`, but usable inside the `subscriptions` function even before the DOM is actually rendered.
 
 `selector` is for finding descendant nodes under the component root element, if you want to listen to events from root element itself, pass `null` as first argument.
 
 ``` js
-var vm = new Vue({
+import { pluck } from 'rxjs/operators'
+
+const vm = new Vue({
   subscriptions () {
     return {
-      inputValue: this.$fromDOMEvent('input', 'keyup').pluck('target', 'value')
+      inputValue: this.$fromDOMEvent('input', 'keyup').pipe(
+        pluck('target', 'value')
+      )
     }
   }
 })
 ```
 
 #### `$createObservableMethod(methodName)`
-
-> This feature requires RxJS.
 
 Convert function calls to observable sequence which emits the call arguments.
 
@@ -253,7 +270,7 @@ This is a prototype method added to instances. Use it to create a shared hot obs
 <custom-form :onSubmit="submitHandler"></custom-form>
 ```
 ``` js
-var vm = new Vue({
+const vm = new Vue({
   subscriptions () {
     return {
       // requires `share` operator
@@ -268,7 +285,7 @@ You can use the `observableMethods` option to make it more declarative:
 ``` js
 new Vue({
   observableMethods: {
-    submitHandler:'submitHandler$'
+    submitHandler: 'submitHandler$'
     // or with Array shothand: ['submitHandler']
   }
 })

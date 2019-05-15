@@ -1,6 +1,6 @@
 <!-- this demo requires a browser that natively supports ES2015 -->
 
-<script src="https://unpkg.com/@reactivex/rxjs/dist/global/Rx.js"></script>
+<script src="https://unpkg.com/rxjs/bundles/rxjs.umd.js"></script>
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
 <script src="../dist/vue-rx.js"></script>
 
@@ -17,6 +17,9 @@
 </div>
 
 <script>
+const { merge } = rxjs
+const { startWith, scan } = rxjs.operators
+
 new Vue({
   el: '#app',
 
@@ -34,16 +37,14 @@ new Vue({
   }, // equivalent of above: ['muchMore','minus']
 
   subscriptions () {
-    var count$ = Rx.Observable
-      .merge(
-      	this.muchMore$,
-        this.minus$
-      )
-      .startWith(0)
-      .scan((total, change) => total + change)
-
     return {
-      count: count$
+      count: merge(
+        this.muchMore$,
+        this.minus$
+      ).pipe(
+        startWith(0),
+        scan((total, change) => total + change)
+      )
     }
   }
 })

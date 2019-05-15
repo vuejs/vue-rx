@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import { WatchOptions } from 'vue'
-import { Observable } from 'rxjs/Observable'
+import { Observable } from 'rxjs'
 
 export type Observables = Record<string, Observable<any>>
 declare module 'vue/types/options' {
@@ -31,4 +31,4 @@ declare module "vue/types/vue" {
   }
 }
 
-export declare function install(V: typeof Vue): void
+export default function VueRx(V: typeof Vue): void
