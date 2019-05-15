@@ -50,11 +50,11 @@ export default {
           data: handle.data
         })
       })
-
-      // store handle on element with a unique key for identifying
-      // multiple v-stream directives on the same node
-      ;(el._rxHandles || (el._rxHandles = {}))[getKey(binding)] = handle
     }
+
+    // store handle on element with a unique key for identifying
+    // multiple v-stream directives on the same node
+    ;(el._rxHandles || (el._rxHandles = {}))[getKey(binding)] = handle
   },
 
   update (el, binding) {
