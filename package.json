@@ -1,6 +1,6 @@
 {
   "name": "vue-rx",
-  "version": "6.1.0",
+  "version": "6.2.0",
   "description": "RxJS bindings for Vue",
   "main": "dist/vue-rx.js",
   "module": "dist/vue-rx.esm.js",
