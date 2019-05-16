@@ -232,7 +232,7 @@ test('v-stream directive (with .stop, .prevent modify)', done => {
   })
 })
 
-test('v-stream directive (with data)', done => {
+test('v-stream directive on native element (with data)', done => {
   const vm = new Vue({
     data: {
       delta: -1
@@ -241,6 +241,52 @@ test('v-stream directive (with data)', done => {
       <div>
         <span class="count">{{ count }}</span>
         <button v-stream:click="{ subject: click$, data: delta }">+</button>
+      </div>
+    `,
+    domStreams: ['click$'],
+    subscriptions () {
+      return {
+        count: this.click$.pipe(
+          pluck('data'),
+          startWith(0),
+          scan((total, change) => total + change),
+        )
+      }
+    }
+  }).$mount()
+
+  expect(vm.$el.querySelector('span').textContent).toBe('0')
+  click(vm.$el.querySelector('button'))
+  nextTick(() => {
+    expect(vm.$el.querySelector('span').textContent).toBe('-1')
+    vm.delta = 1
+    nextTick(() => {
+      click(vm.$el.querySelector('button'))
+      nextTick(() => {
+        expect(vm.$el.querySelector('span').textContent).toBe('0')
+        done()
+      })
+    })
+  })
+})
+
+test('v-stream directive on custom component (with data)', done => {
+  const customButton = {
+    name: 'custom-button',
+    template: `<button @click="$emit('click')"><slot/></button>`
+  }
+
+  const vm = new Vue({
+    components: {
+      customButton
+    },
+    data: {
+      delta: -1
+    },
+    template: `
+      <div>
+        <span class="count">{{ count }}</span>
+        <custom-button v-stream:click="{ subject: click$, data: delta }">+</custom-button>
       </div>
     `,
     domStreams: ['click$'],
