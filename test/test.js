@@ -232,48 +232,10 @@ test('v-stream directive (with .stop, .prevent modify)', done => {
   })
 })
 
-test('v-stream directive on native element (with data)', done => {
-  const vm = new Vue({
-    data: {
-      delta: -1
-    },
-    template: `
-      <div>
-        <span class="count">{{ count }}</span>
-        <button v-stream:click="{ subject: click$, data: delta }">+</button>
-      </div>
-    `,
-    domStreams: ['click$'],
-    subscriptions () {
-      return {
-        count: this.click$.pipe(
-          pluck('data'),
-          startWith(0),
-          scan((total, change) => total + change),
-        )
-      }
-    }
-  }).$mount()
-
-  expect(vm.$el.querySelector('span').textContent).toBe('0')
-  click(vm.$el.querySelector('button'))
-  nextTick(() => {
-    expect(vm.$el.querySelector('span').textContent).toBe('-1')
-    vm.delta = 1
-    nextTick(() => {
-      click(vm.$el.querySelector('button'))
-      nextTick(() => {
-        expect(vm.$el.querySelector('span').textContent).toBe('0')
-        done()
-      })
-    })
-  })
-})
-
-test('v-stream directive on custom component (with data)', done => {
+test('v-stream directive (with data)', done => {
   const customButton = {
     name: 'custom-button',
-    template: `<button @click="$emit('click')"><slot/></button>`
+    template: `<button id="custom-button" @click="$emit('click')"><slot/></button>`
   }
 
   const vm = new Vue({
@@ -286,6 +248,7 @@ test('v-stream directive on custom component (with data)', done => {
     template: `
       <div>
         <span class="count">{{ count }}</span>
+        <button id="native-button" v-stream:click="{ subject: click$, data: delta }">+</button>
         <custom-button v-stream:click="{ subject: click$, data: delta }">+</custom-button>
       </div>
     `,
@@ -302,12 +265,12 @@ test('v-stream directive on custom component (with data)', done => {
   }).$mount()
 
   expect(vm.$el.querySelector('span').textContent).toBe('0')
-  click(vm.$el.querySelector('button'))
+  click(vm.$el.querySelector('#custom-button'))
   nextTick(() => {
     expect(vm.$el.querySelector('span').textContent).toBe('-1')
     vm.delta = 1
     nextTick(() => {
-      click(vm.$el.querySelector('button'))
+      click(vm.$el.querySelector('#native-button'))
       nextTick(() => {
         expect(vm.$el.querySelector('span').textContent).toBe('0')
         done()
