@@ -235,7 +235,7 @@ test('v-stream directive (with .stop, .prevent modify)', done => {
 test('v-stream directive (with data)', done => {
   const customButton = {
     name: 'custom-button',
-    template: `<button id="custom-button" @click="$emit('click')"><slot/></button>`
+    template: `<button id="custom-button" @click="$emit('click-custom')"><slot/></button>`
   }
 
   const vm = new Vue({
@@ -249,7 +249,7 @@ test('v-stream directive (with data)', done => {
       <div>
         <span class="count">{{ count }}</span>
         <button id="native-button" v-stream:click="{ subject: click$, data: delta }">+</button>
-        <custom-button v-stream:click="{ subject: click$, data: delta }">+</custom-button>
+        <custom-button v-stream:click-custom="{ subject: click$, data: delta }">+</custom-button>
       </div>
     `,
     domStreams: ['click$'],
