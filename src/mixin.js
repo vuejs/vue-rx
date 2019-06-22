@@ -47,7 +47,11 @@ export default {
       })
     }
   },
-
+  serverPrefetch () {
+    if (this._subscription) {
+      this._subscription.unsubscribe()
+    }
+  },
   beforeDestroy () {
     if (this._subscription) {
       this._subscription.unsubscribe()
