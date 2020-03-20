@@ -1,8 +1,9 @@
 import Vue from 'vue'
 import { WatchOptions } from 'vue'
-import { Observable } from 'rxjs'
+import { Subscribable, PartialObserver } from 'rxjs'
 
-export type Observables = Record<string, Observable<any>>
+export type Observables = Record<string, Subscribable<any>>
+
 declare module 'vue/types/options' {
   interface ComponentOptions<V extends Vue> {
     subscriptions?: Observables | ((this: V) => Observables)
@@ -15,19 +16,27 @@ export interface WatchObservable<T> {
   newValue: T
   oldValue: T
 }
+
 declare module "vue/types/vue" {
   interface Vue {
     $observables: Observables;
-    $watchAsObservable(expr: string, options?: WatchOptions): Observable<WatchObservable<any>>
-    $watchAsObservable<T>(fn: (this: this) => T, options?: WatchOptions): Observable<WatchObservable<T>>
-    $eventToObservable(event: string): Observable<{name: string, msg: any}>
+    $watchAsObservable(expr: string, options?: WatchOptions): Subscribable<WatchObservable<any>>
+    $watchAsObservable<T>(fn: (this: this) => T, options?: WatchOptions): Subscribable<WatchObservable<T>>
+    $eventToObservable(event: string): Subscribable<{name: string, msg: any}>
+    $fromDOMEvent(selector: string | null, event: string): Subscribable<Event>
+    $createObservableMethod(methodName: string): Subscribable<any>
+
     $subscribeTo<T>(
-      observable: Observable<T>,
-      next: (t: T) => void,
-      error?: (e: any) => void,
-      complete?: () => void): void
-    $fromDOMEvent(selector: string | null, event: string): Observable<Event>
-    $createObservableMethod(methodName: string): Observable<any>
+      observable: Subscribable<T>,
+      observer?: PartialObserver<T>,
+    ): void;
+
+    $subscribeTo<T>(
+      observable: Subscribable<T>,
+      next: (value: T) => void,
+      error?: (error: any) => void,
+      complete?: () => void,
+    ): void;
   }
 }
 
