@@ -30,7 +30,7 @@ export default {
     }
     if (obs) {
       vm.$observables = {}
-      vm._subscription = new Subscription()
+      vm._subscription = (vm._subscription || new Subscription())
       Object.keys(obs).forEach(key => {
         defineReactive(vm, key, undefined)
         const ob = vm.$observables[key] = obs[key]
