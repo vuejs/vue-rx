@@ -233,14 +233,23 @@ test('v-stream directive (with .stop, .prevent modify)', done => {
 })
 
 test('v-stream directive (with data)', done => {
+  const customButton = {
+    name: 'custom-button',
+    template: `<button id="custom-button" @click="$emit('click-custom')"><slot/></button>`
+  }
+
   const vm = new Vue({
+    components: {
+      customButton
+    },
     data: {
       delta: -1
     },
     template: `
       <div>
         <span class="count">{{ count }}</span>
-        <button v-stream:click="{ subject: click$, data: delta }">+</button>
+        <button id="native-button" v-stream:click="{ subject: click$, data: delta }">+</button>
+        <custom-button v-stream:click-custom="{ subject: click$, data: delta }">+</custom-button>
       </div>
     `,
     domStreams: ['click$'],
@@ -256,12 +265,12 @@ test('v-stream directive (with data)', done => {
   }).$mount()
 
   expect(vm.$el.querySelector('span').textContent).toBe('0')
-  click(vm.$el.querySelector('button'))
+  click(vm.$el.querySelector('#custom-button'))
   nextTick(() => {
     expect(vm.$el.querySelector('span').textContent).toBe('-1')
     vm.delta = 1
     nextTick(() => {
-      click(vm.$el.querySelector('button'))
+      click(vm.$el.querySelector('#native-button'))
       nextTick(() => {
         expect(vm.$el.querySelector('span').textContent).toBe('0')
         done()
