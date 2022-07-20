@@ -2,10 +2,10 @@
 
 English | [简体中文](README-CN.md)
 
-[RxJS v6](https://github.com/ReactiveX/rxjs) integration for Vue.js.
+[RxJS v6+](https://github.com/ReactiveX/rxjs) integration for Vue.js.
 
 > **BREAKING CHANGES from 5.0**
-> - vue-rx v6 now only works with RxJS v6 by default. If you want to keep using RxJS v5 style code, install `rxjs-compat`.
+> - vue-rx v6 now only works with RxJS v6+ by default. If you want to keep using RxJS v5 style code, install `rxjs-compat`.
 
 ### Installation
 

@@ -2,11 +2,11 @@
 
 [English](README.md) | 简体中文
 
-将 [RxJS v6](https://github.com/ReactiveX/rxjs) 集成到 Vue.js。
+将 [RxJS v6+](https://github.com/ReactiveX/rxjs) 集成到 Vue.js。
 
 > **相比 5.0 的不兼容变更**
 >
-> - vue-rx v6 现在默认只对 RxJS V6 生效。如果你想继续使用 RxJS v5 风格的代码，安装 `rxjs-compat`。
+> - vue-rx v6 现在默认只对 RxJS V6+ 生效。如果你想继续使用 RxJS v5 风格的代码，安装 `rxjs-compat`。
 
 ### 安装
 
